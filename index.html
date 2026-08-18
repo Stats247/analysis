@@ -43,7 +43,18 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        th { white-space: nowrap; position: sticky; top: 0; background-color: #1E3A8A; color: white; z-index: 10; }
+        /* Animated Compass Needle */
+        @keyframes compassRotate {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animated-compass-needle {
+            transform-origin: center;
+            animation: compassRotate 6s linear infinite;
+        }
+
+        th { white-space: nowrap; position: sticky; top: 0; z-index: 10; }
         td { white-space: nowrap; }
         
         /* Modal Styles */
@@ -56,16 +67,25 @@
 
     <nav class="bg-customNavy text-white p-4 shadow-md flex justify-between items-center shrink-0">
         <div class="flex items-center space-x-3">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l1.5 4.5 4.5 1.5-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22a10 10 0 100-20 10 10 0 000 20z"></path>
+            <!-- Animated Compass Logo SVG -->
+            <svg class="w-9 h-9 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-opacity="0.4"/>
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                <g class="animated-compass-needle">
+                    <polygon points="12,4 14.5,12 12,10" fill="#60A5FA"/>
+                    <polygon points="12,4 9.5,12 12,10" fill="#93C5FD"/>
+                    <polygon points="12,20 14.5,12 12,14" fill="#9CA3AF"/>
+                    <polygon points="12,20 9.5,12 12,14" fill="#D1D5DB"/>
+                </g>
+                <circle cx="12" cy="12" r="1.5" fill="white"/>
             </svg>
-            <h1 class="text-2xl font-bold tracking-wider text-white">DataCompas<span class="text-customTeal">360</span></h1>
+            <h1 class="text-2xl font-bold tracking-wider text-white">DataCompas<span class="text-white">360</span></h1>
         </div>
-        <div class="space-x-2">
-            <button onclick="switchTab('all-matches')" id="tab-all-matches" class="tab-btn active px-4 py-2 rounded-t-lg bg-white/10 hover:bg-white/20">All Matches</button>
-            <button onclick="switchTab('best-matches')" id="tab-best-matches" class="tab-btn px-4 py-2 rounded-t-lg bg-white/10 hover:bg-white/20">Best Matches</button>
-            <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn px-4 py-2 rounded-t-lg bg-white/10 hover:bg-white/20">Settings</button>
+        <div class="space-x-1 sm:space-x-2 overflow-x-auto">
+            <button onclick="switchTab('all-matches')" id="tab-all-matches" class="tab-btn active px-3 py-2 rounded-t-lg bg-white/10 hover:bg-white/20 text-sm sm:text-base">All Matches</button>
+            <button onclick="switchTab('best-matches')" id="tab-best-matches" class="tab-btn px-3 py-2 rounded-t-lg bg-white/10 hover:bg-white/20 text-sm sm:text-base">Best Matches</button>
+            <button onclick="switchTab('analysis')" id="tab-analysis" class="tab-btn px-3 py-2 rounded-t-lg bg-white/10 hover:bg-white/20 text-sm sm:text-base">Analysis</button>
+            <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn px-3 py-2 rounded-t-lg bg-white/10 hover:bg-white/20 text-sm sm:text-base">Settings</button>
         </div>
     </nav>
 
@@ -86,7 +106,7 @@
                 </div>
                 
                 <div class="flex flex-wrap gap-2 items-center w-full">
-                    <input type="date" id="filter-date" class="border p-1 rounded text-sm w-36 focus:outline-customTeal" title="Date (MM/DD/YYYY linked)">
+                    <input type="date" id="filter-date" class="border p-1 rounded text-sm w-36 focus:outline-customTeal" title="Date">
                     
                     <select id="filter-month" class="border p-1 rounded text-sm w-32 focus:outline-customTeal">
                         <option value="">All Months</option>
@@ -126,19 +146,29 @@
                 </div>
             </div>
 
-            <div class="flex-1 overflow-auto table-container border rounded">
+            <!-- Sticky Model Wins Summary Bar Above Table -->
+            <div class="bg-blue-900 text-white text-xs font-semibold px-4 py-2 rounded-t-lg flex flex-wrap justify-around items-center shadow-md border-b border-white/20 shrink-0">
+                <span class="font-bold uppercase tracking-wider text-blue-200">Model Win Counts (Filtered):</span>
+                <span id="summary-all-m1" class="px-2 py-1 bg-blue-800 rounded">M1: 0/0</span>
+                <span id="summary-all-m2" class="px-2 py-1 bg-blue-800 rounded">M2: 0/0</span>
+                <span id="summary-all-m3" class="px-2 py-1 bg-blue-800 rounded">M3: 0/0</span>
+                <span id="summary-all-m4" class="px-2 py-1 bg-blue-800 rounded">M4: 0/0</span>
+                <span id="summary-all-m5" class="px-2 py-1 bg-blue-800 rounded">M5: 0/0</span>
+            </div>
+
+            <div class="flex-1 overflow-auto table-container border border-t-0 rounded-b">
                 <table class="min-w-full bg-white text-sm">
                     <thead>
                         <tr>
-                            <th class="py-2 px-3 border-b text-left">Home Team</th>
-                            <th class="py-2 px-3 border-b text-left">Away Team</th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30">Mode 1<br><span class="text-xs font-normal">Pred | Model 1 | Conf % | Prob</span></th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30">Mode 2<br><span class="text-xs font-normal">Pred | Model 2 | Prob % | Prob</span></th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30">Mode 3<br><span class="text-xs font-normal">Tip | Model 3 | Likely | Prob</span></th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30">Mode 4<br><span class="text-xs font-normal">Pred | Model 4 | Prob % | Prob</span></th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30">Mode 5<br><span class="text-xs font-normal">Pred | Model 5 | Chance | Prob</span></th>
-                            <th class="py-2 px-3 border-b text-center">Match Result</th>
-                            <th class="py-2 px-3 border-b text-center">Action</th>
+                            <th class="py-2 px-3 border-b text-left max-w-[140px] truncate bg-customNavy text-white">Home Team</th>
+                            <th class="py-2 px-3 border-b text-left max-w-[140px] truncate bg-customNavy text-white">Away Team</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 1<br><span class="text-xs font-normal">Prediction | Model 1 | Conf % | Mod 1 Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 2<br><span class="text-xs font-normal">Model Pred | Model 2 | Prob % | Mod 2 Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 3<br><span class="text-xs font-normal">Tip | Model 3 | Likely | Mod 3 Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 4<br><span class="text-xs font-normal">Model Pred | Model 4 | Prob % | Mod 4 Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 5<br><span class="text-xs font-normal">Outcome Pred | Model 5 | Chance | Mod 5 Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center bg-customNavy text-white">Match Result</th>
+                            <th class="py-2 px-3 border-b text-center bg-customNavy text-white">Action</th>
                         </tr>
                     </thead>
                     <tbody id="table-body-all" class="text-gray-700"></tbody>
@@ -192,19 +222,29 @@
                 </div>
             </div>
 
-            <div class="flex-1 overflow-auto table-container border rounded">
+            <!-- Sticky Model Wins Summary Bar Above Best Matches Table -->
+            <div class="bg-emerald-900 text-white text-xs font-semibold px-4 py-2 rounded-t-lg flex flex-wrap justify-around items-center shadow-md border-b border-white/20 shrink-0">
+                <span class="font-bold uppercase tracking-wider text-emerald-200">Model Win Counts (Filtered):</span>
+                <span id="summary-best-m1" class="px-2 py-1 bg-emerald-800 rounded">M1: 0/0</span>
+                <span id="summary-best-m2" class="px-2 py-1 bg-emerald-800 rounded">M2: 0/0</span>
+                <span id="summary-best-m3" class="px-2 py-1 bg-emerald-800 rounded">M3: 0/0</span>
+                <span id="summary-best-m4" class="px-2 py-1 bg-emerald-800 rounded">M4: 0/0</span>
+                <span id="summary-best-m5" class="px-2 py-1 bg-emerald-800 rounded">M5: 0/0</span>
+            </div>
+
+            <div class="flex-1 overflow-auto table-container border border-t-0 rounded-b">
                 <table class="min-w-full bg-white text-sm">
                     <thead>
                         <tr>
-                            <th class="py-2 px-3 border-b text-left bg-customGreen">Home Team</th>
-                            <th class="py-2 px-3 border-b text-left bg-customGreen">Away Team</th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen">Mode 1</th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen">Mode 2</th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen">Mode 3</th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen">Mode 4</th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen">Mode 5</th>
-                            <th class="py-2 px-3 border-b text-center bg-customGreen">Match Result</th>
-                            <th class="py-2 px-3 border-b text-center bg-customGreen">Action</th>
+                            <th class="py-2 px-3 border-b text-left bg-customGreen text-white max-w-[140px] truncate">Home Team</th>
+                            <th class="py-2 px-3 border-b text-left bg-customGreen text-white max-w-[140px] truncate">Away Team</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen text-white">Model 1</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen text-white">Model 2</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen text-white">Model 3</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen text-white">Model 4</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen text-white">Model 5</th>
+                            <th class="py-2 px-3 border-b text-center bg-customGreen text-white">Match Result</th>
+                            <th class="py-2 px-3 border-b text-center bg-customGreen text-white">Action</th>
                         </tr>
                     </thead>
                     <tbody id="table-body-best" class="text-gray-700"></tbody>
@@ -220,6 +260,156 @@
             </div>
         </div>
 
+        <div id="content-analysis" class="hidden-content h-full flex flex-col bg-white rounded-lg shadow p-4 overflow-auto">
+            <div class="flex justify-between items-center border-b pb-3 mb-4 shrink-0">
+                <div>
+                    <h2 class="text-xl font-bold text-customNavy">Model Performance & Outcome Analysis</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Rankings of Model 1 through Model 5 based on exact prediction columns (Prediction, Model Prediction, Match Prediction Tip, Match outcome Prediction).</p>
+                </div>
+                <button onclick="renderAnalysisTab()" class="bg-customNavy hover:bg-blue-800 text-white px-4 py-2 rounded text-sm shadow">🔄 Refresh Analysis</button>
+            </div>
+
+            <!-- Analysis Filter Bar -->
+            <div class="mb-4 flex flex-col border-b pb-3 bg-gray-50 p-3 rounded-lg border shrink-0">
+                <div class="flex justify-between items-center w-full mb-2">
+                    <h3 class="text-base font-bold text-customNavy">Analysis Filter Criteria</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="openAnAdvFilters()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-3 py-1 rounded text-sm border border-indigo-300">
+                            ⚙️ Advanced Filters
+                        </button>
+                        <button onclick="resetAnalysisFilters()" class="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm">Clear Filters</button>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2 items-center w-full">
+                    <input type="date" id="an-filter-date" class="border p-1 rounded text-sm w-36 focus:outline-customTeal">
+                    
+                    <select id="an-filter-month" class="border p-1 rounded text-sm w-32 focus:outline-customTeal">
+                        <option value="">All Months</option>
+                        <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+                        <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+                        <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+                        <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                    </select>
+
+                    <select id="an-filter-league" class="border p-1 rounded text-sm w-36 focus:outline-customTeal">
+                        <option value="">All Leagues</option>
+                    </select>
+
+                    <select id="an-filter-prediction" class="border p-1 rounded text-sm w-36 focus:outline-customTeal">
+                        <option value="">All Predictions</option>
+                    </select>
+
+                    <div class="flex items-center space-x-1 border p-1 rounded text-sm bg-white">
+                        <label class="flex items-center space-x-1 cursor-pointer text-xs font-semibold text-customGreen">
+                            <input type="checkbox" id="an-apply-thresholds" class="rounded text-customGreen focus:ring-customGreen">
+                            <span>Apply Best Matches Thresholds</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex items-center ml-auto">
+                        <input type="text" id="an-search-team" placeholder="Search Home/Away Team..." class="border-2 border-customTeal p-1 rounded text-sm w-48 focus:outline-customNavy">
+                    </div>
+                    
+                    <button onclick="applyAnalysisFilters()" class="bg-customNavy hover:bg-blue-800 text-white px-3 py-1 rounded text-sm w-full md:w-auto mt-2 lg:mt-0">Apply</button>
+                </div>
+            </div>
+
+            <!-- Analysis Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+                <!-- Overall Performance Ranking -->
+                <div class="bg-gray-50 border rounded-xl p-4 shadow-sm flex flex-col">
+                    <h3 class="font-bold text-customNavy text-lg mb-3 flex items-center gap-2">
+                        <span>🏆 Overall Model Rankings</span>
+                    </h3>
+                    <div class="overflow-x-auto flex-1">
+                        <table class="min-w-full text-sm bg-white rounded shadow-inner">
+                            <thead>
+                                <tr class="bg-customNavy text-white">
+                                    <th class="py-2 px-3 text-left">Rank</th>
+                                    <th class="py-2 px-3 text-left">Model & Key Column</th>
+                                    <th class="py-2 px-3 text-center">Correct / Total</th>
+                                    <th class="py-2 px-3 text-center">Win Rate %</th>
+                                    <th class="py-2 px-3 text-center">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analysis-overall-tbody" class="divide-y divide-gray-100">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Home Win Performance -->
+                <div class="bg-gray-50 border rounded-xl p-4 shadow-sm flex flex-col">
+                    <h3 class="font-bold text-customBlue text-lg mb-3 flex items-center gap-2">
+                        <span>🏠 Home Win Outcome Performance (1)</span>
+                    </h3>
+                    <div class="overflow-x-auto flex-1">
+                        <table class="min-w-full text-sm bg-white rounded shadow-inner">
+                            <thead>
+                                <tr class="bg-blue-700 text-white">
+                                    <th class="py-2 px-3 text-left">Rank</th>
+                                    <th class="py-2 px-3 text-left">Model</th>
+                                    <th class="py-2 px-3 text-center">Correct / Total Home</th>
+                                    <th class="py-2 px-3 text-center">Home Win %</th>
+                                    <th class="py-2 px-3 text-center">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analysis-home-tbody" class="divide-y divide-gray-100">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Draw Outcome Performance -->
+                <div class="bg-gray-50 border rounded-xl p-4 shadow-sm flex flex-col">
+                    <h3 class="font-bold text-amber-700 text-lg mb-3 flex items-center gap-2">
+                        <span>🤝 Draw Outcome Performance (X)</span>
+                    </h3>
+                    <div class="overflow-x-auto flex-1">
+                        <table class="min-w-full text-sm bg-white rounded shadow-inner">
+                            <thead>
+                                <tr class="bg-amber-700 text-white">
+                                    <th class="py-2 px-3 text-left">Rank</th>
+                                    <th class="py-2 px-3 text-left">Model</th>
+                                    <th class="py-2 px-3 text-center">Correct / Total Draw</th>
+                                    <th class="py-2 px-3 text-center">Draw Win %</th>
+                                    <th class="py-2 px-3 text-center">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analysis-draw-tbody" class="divide-y divide-gray-100">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Away Win Performance -->
+                <div class="bg-gray-50 border rounded-xl p-4 shadow-sm flex flex-col">
+                    <h3 class="font-bold text-customTeal text-lg mb-3 flex items-center gap-2">
+                        <span>✈️ Away Win Outcome Performance (2)</span>
+                    </h3>
+                    <div class="overflow-x-auto flex-1">
+                        <table class="min-w-full text-sm bg-white rounded shadow-inner">
+                            <thead>
+                                <tr class="bg-teal-700 text-white">
+                                    <th class="py-2 px-3 text-left">Rank</th>
+                                    <th class="py-2 px-3 text-left">Model</th>
+                                    <th class="py-2 px-3 text-center">Correct / Total Away</th>
+                                    <th class="py-2 px-3 text-center">Away Win %</th>
+                                    <th class="py-2 px-3 text-center">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analysis-away-tbody" class="divide-y divide-gray-100">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="content-settings" class="hidden-content h-full flex flex-col bg-white rounded-lg shadow p-4 overflow-hidden">
             <div class="flex justify-between items-center border-b pb-2 mb-4 shrink-0">
                 <h2 class="text-xl font-bold text-customTeal">Threshold Settings for Best Matches</h2>
@@ -227,7 +417,6 @@
             </div>
             
             <div class="flex-1 overflow-auto bg-white rounded-lg p-4 shadow-inner border">
-                <!-- Multi-column table header -->
                 <div class="hidden lg:grid grid-cols-2 gap-x-8 mb-2 border-b-2 border-gray-200 pb-2 bg-gray-50 px-2">
                     <div class="grid grid-cols-[1fr_80px_80px] gap-2 font-bold text-gray-700 text-sm uppercase tracking-wide">
                         <div>Parameter</div><div class="text-center">Min</div><div class="text-center">Max</div>
@@ -236,7 +425,6 @@
                         <div>Parameter</div><div class="text-center">Min</div><div class="text-center">Max</div>
                     </div>
                 </div>
-                <!-- Mobile header -->
                 <div class="lg:hidden grid grid-cols-[1fr_80px_80px] gap-2 font-bold text-gray-700 text-sm uppercase tracking-wide border-b-2 border-gray-200 pb-2 mb-2 bg-gray-50 px-2">
                     <div>Parameter</div><div class="text-center">Min</div><div class="text-center">Max</div>
                 </div>
@@ -306,6 +494,24 @@
         </div>
     </div>
 
+    <!-- ANALYSIS ADV FILTER MODAL -->
+    <div id="an-adv-filter-modal" class="fixed inset-0 modal-overlay hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="bg-customNavy text-white p-4 rounded-t-xl flex justify-between items-center">
+                <h3 class="text-lg font-bold">Advanced Filters (Analysis) - Min & Max Criteria</h3>
+                <button onclick="closeAnAdvFilters()" class="text-white hover:text-gray-300 font-bold text-xl">&times;</button>
+            </div>
+            <div class="p-4 overflow-auto flex-1 bg-gray-50">
+                <p class="text-xs text-gray-500 mb-4">Set Min and/or Max values for the fields below to refine your analysis dataset.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="an-adv-filter-grid"></div>
+            </div>
+            <div class="p-4 border-t flex justify-end space-x-2 bg-white rounded-b-xl">
+                <button onclick="clearAnAdvFilters()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">Clear Advanced</button>
+                <button onclick="applyAnAdvFilters()" class="bg-customNavy hover:bg-blue-700 text-white px-4 py-2 rounded">Apply & Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const DATA_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4skYgtxtfHuZElx4Mrx2n4NC0keZGjsKxgZNHOpPGrkVy2j_5GQWmyNlQu1y5TAjQKfDHAiBVknfi/pub?output=csv';
         const SETTINGS_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ZPDWEqN5dhGUsRkUDTFh2-osBnHf0aCkBUFHOOD_KHg/export?format=csv&gid=1001059226';
@@ -336,6 +542,7 @@
             "Power Difference", "H2H Home Wins", "H2H Draw", "H2H Away Wins"
         ];
 
+        // Maps header names to arrays of column indices to handle duplicate column headers correctly
         let headerMap = {};
 
         window.onload = async () => {
@@ -355,8 +562,10 @@
 
             document.getElementById('filter-date').value = isoDate;
             document.getElementById('bm-filter-date').value = isoDate;
+            document.getElementById('an-filter-date').value = isoDate;
             document.getElementById('filter-month').value = currentMonth;
             document.getElementById('bm-filter-month').value = currentMonth;
+            document.getElementById('an-filter-month').value = currentMonth;
         }
 
         function switchTab(tabId) {
@@ -365,8 +574,13 @@
             
             document.getElementById('content-all-matches').style.display = 'none';
             document.getElementById('content-best-matches').style.display = 'none';
+            document.getElementById('content-analysis').style.display = 'none';
             document.getElementById('content-settings').style.display = 'none';
             document.getElementById('content-' + tabId).style.display = 'flex';
+
+            if (tabId === 'analysis') {
+                renderAnalysisTab();
+            }
         }
 
         function showLoader(show) { document.getElementById('loader').style.display = show ? 'block' : 'none'; }
@@ -427,7 +641,7 @@
                 let char = text[i];
                 if (char === '"') {
                     if (inQuotes && text[i+1] === '"') {
-                        val += '"'; i++; // skip escaped quote
+                        val += '"'; i++;
                     } else {
                         inQuotes = !inQuotes;
                     }
@@ -447,7 +661,12 @@
             const parsed = parseCSV(csvText);
             if (parsed.length < 2) return;
             const headers = parsed[0];
-            headerMap = {}; headers.forEach((h, i) => { headerMap[h.trim()] = i; });
+            headerMap = {}; 
+            headers.forEach((h, i) => { 
+                const key = h.trim();
+                if (!headerMap[key]) headerMap[key] = [];
+                headerMap[key].push(i);
+            });
             globalData = [];
             for (let i = 1; i < parsed.length; i++) {
                 if (parsed[i].length > 1 && parsed[i].join('').trim() !== '') globalData.push(parsed[i]);
@@ -477,8 +696,8 @@
                 const l = getVal(row, 'League'); const p = getVal(row, 'Prediction');
                 if (l) leaguesSet.add(l); if (p) predsSet.add(p);
             });
-            const leagueSelects = [document.getElementById('filter-league'), document.getElementById('bm-filter-league')];
-            const predSelects = [document.getElementById('filter-prediction'), document.getElementById('bm-filter-prediction')];
+            const leagueSelects = [document.getElementById('filter-league'), document.getElementById('bm-filter-league'), document.getElementById('an-filter-league')];
+            const predSelects = [document.getElementById('filter-prediction'), document.getElementById('bm-filter-prediction'), document.getElementById('an-filter-prediction')];
 
             leagueSelects.forEach(sel => {
                 if(!sel) return; const currentVal = sel.value;
@@ -515,13 +734,14 @@
         function generateAdvFiltersUI() {
             const advContainer = document.getElementById('adv-filter-grid');
             const bmAdvContainer = document.getElementById('bm-adv-filter-grid');
-            if(!advContainer || !bmAdvContainer) return;
+            const anAdvContainer = document.getElementById('an-adv-filter-grid');
+            if(!advContainer || !bmAdvContainer || !anAdvContainer) return;
             advContainer.innerHTML = '';
             bmAdvContainer.innerHTML = '';
+            anAdvContainer.innerHTML = '';
             
             advFields.forEach(field => {
                 const fId = field.replace(/\s+/g, '-');
-                // All Matches
                 advContainer.innerHTML += `
                     <div class="bg-white p-3 rounded shadow-sm border border-gray-100 flex flex-col">
                         <label class="text-sm font-semibold text-indigo-800 mb-2 truncate" title="${field}">${field}</label>
@@ -531,13 +751,21 @@
                         </div>
                     </div>
                 `;
-                // Best Matches
                 bmAdvContainer.innerHTML += `
                     <div class="bg-white p-3 rounded shadow-sm border border-gray-100 flex flex-col">
                         <label class="text-sm font-semibold text-customGreen mb-2 truncate" title="${field}">${field}</label>
                         <div class="flex space-x-2">
                             <input type="number" step="any" id="bm-adv-min-${fId}" placeholder="Min" class="w-1/2 border rounded px-2 py-1 text-sm focus:outline-customGreen">
                             <input type="number" step="any" id="bm-adv-max-${fId}" placeholder="Max" class="w-1/2 border rounded px-2 py-1 text-sm focus:outline-customGreen">
+                        </div>
+                    </div>
+                `;
+                anAdvContainer.innerHTML += `
+                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100 flex flex-col">
+                        <label class="text-sm font-semibold text-customNavy mb-2 truncate" title="${field}">${field}</label>
+                        <div class="flex space-x-2">
+                            <input type="number" step="any" id="an-adv-min-${fId}" placeholder="Min" class="w-1/2 border rounded px-2 py-1 text-sm focus:outline-customNavy">
+                            <input type="number" step="any" id="an-adv-max-${fId}" placeholder="Max" class="w-1/2 border rounded px-2 py-1 text-sm focus:outline-customNavy">
                         </div>
                     </div>
                 `;
@@ -566,7 +794,6 @@
             });
             localStorage.setItem('datacompas_thresholds', JSON.stringify(thresholds));
             
-            // Show a brief success message
             const btn = document.querySelector('button[onclick="applySettingsLocally()"]');
             const originalText = btn.textContent;
             btn.textContent = 'Saved!';
@@ -592,7 +819,12 @@
             applyBestMatchesFilters();
         }
 
-        function getVal(row, colName) {
+        function getVal(row, colName, occurrence = 0) {
+            const indices = headerMap[colName];
+            if (indices && Array.isArray(indices)) {
+                const idx = indices[occurrence] !== undefined ? indices[occurrence] : indices[0];
+                return idx !== undefined && idx < row.length ? row[idx] : '';
+            }
             const idx = headerMap[colName];
             return idx !== undefined && idx < row.length ? row[idx] : '';
         }
@@ -684,7 +916,6 @@
                 if (!home.includes(dSearch) && !away.includes(dSearch)) return false;
             }
 
-            // Advanced Modal Filters check
             for (let f of advFields) {
                 const fId = f.replace(/\s+/g, '-');
                 const pfx = type === 'all' ? 'adv-' : 'bm-adv-';
@@ -728,6 +959,98 @@
             return true;
         }
 
+        function matchAnalysisRowFilters(row) {
+            const prefix = 'an-';
+
+            const dDate = document.getElementById(prefix + 'filter-date').value;
+            const dMonth = document.getElementById(prefix + 'filter-month').value;
+            const dLeague = document.getElementById(prefix + 'filter-league').value.toLowerCase();
+            const dPred = document.getElementById(prefix + 'filter-prediction').value.toLowerCase();
+            const dSearch = document.getElementById(prefix + 'search-team').value.toLowerCase();
+
+            const rowDateParsed = parseSheetDate(getVal(row, 'Date'));
+            if (dMonth) { if (!rowDateParsed || rowDateParsed.m !== parseInt(dMonth)) return false; }
+            if (dDate) {
+                const [y, m, d] = dDate.split('-');
+                if (!rowDateParsed || rowDateParsed.y !== parseInt(y) || rowDateParsed.m !== parseInt(m) || rowDateParsed.d !== parseInt(d)) return false;
+            }
+
+            if (dLeague && (getVal(row, 'League')||'').toLowerCase() !== dLeague) return false;
+            if (dPred && (getVal(row, 'Prediction')||'').toLowerCase() !== dPred) return false;
+
+            if (dSearch) {
+                const home = (getVal(row, 'Home Team')||'').toLowerCase();
+                const away = (getVal(row, 'Away Team')||'').toLowerCase();
+                if (!home.includes(dSearch) && !away.includes(dSearch)) return false;
+            }
+
+            for (let f of advFields) {
+                const fId = f.replace(/\s+/g, '-');
+                const minEl = document.getElementById(`an-adv-min-${fId}`);
+                const maxEl = document.getElementById(`an-adv-max-${fId}`);
+                
+                const minVal = minEl ? minEl.value : '';
+                const maxVal = maxEl ? maxEl.value : '';
+                
+                if (minVal !== '' || maxVal !== '') {
+                    let cellVal = parseFloat(getVal(row, f));
+                    if (isNaN(cellVal)) return false;
+                    if (minVal !== '' && cellVal < parseFloat(minVal)) return false;
+                    if (maxVal !== '' && cellVal > parseFloat(maxVal)) return false;
+                }
+            }
+
+            const applyThresholds = document.getElementById('an-apply-thresholds').checked;
+            if (applyThresholds && !matchThresholds(row)) return false;
+
+            return true;
+        }
+
+        function applyAnalysisFilters() {
+            renderAnalysisTab();
+        }
+
+        function resetAnalysisFilters() {
+            document.getElementById('an-filter-league').value = '';
+            document.getElementById('an-filter-prediction').value = '';
+            document.getElementById('an-search-team').value = '';
+            document.getElementById('an-apply-thresholds').checked = false;
+            initDateFilter();
+            clearAnAdvFilters(false);
+            renderAnalysisTab();
+        }
+
+        function openAnAdvFilters() {
+            document.getElementById('an-adv-filter-modal').classList.remove('hidden');
+            document.getElementById('an-adv-filter-modal').classList.add('flex');
+        }
+        function closeAnAdvFilters() { closeModal('an-adv-filter-modal'); }
+        function clearAnAdvFilters(apply = true) {
+            const inputs = document.getElementById('an-adv-filter-grid').querySelectorAll('input');
+            inputs.forEach(inp => inp.value = '');
+            if(apply) renderAnalysisTab();
+        }
+        function applyAnAdvFilters() { renderAnalysisTab(); closeAnAdvFilters(); }
+
+        function getActualOutcome(result) {
+            if (!result || !result.includes('-')) return '';
+            const parts = result.split('-');
+            const homeG = parseInt(parts[0]); const awayG = parseInt(parts[1]);
+            if (isNaN(homeG) || isNaN(awayG)) return '';
+            if (homeG > awayG) return '1'; // Home win
+            if (homeG < awayG) return '2'; // Away win
+            return 'X'; // Draw
+        }
+
+        function normalizePrediction(pred) {
+            if (!pred) return '';
+            let p = pred.toString().trim().toLowerCase();
+            if (p.includes('home win') || p === 'home' || p === '1') return '1';
+            if (p.includes('away win') || p === 'away' || p === '2') return '2';
+            if (p.includes('draw') || p === 'x') return 'X';
+            return '';
+        }
+
         function getOutcomeColorClass(prediction, result) {
             if (!prediction || !result) return '';
             let predClean = prediction.toString().trim().toLowerCase();
@@ -742,16 +1065,22 @@
             else if (homeG === awayG) matchOutcome = 'x';
             else return '';
 
-            if (predClean === 'home' || predClean === '1') predClean = '1';
-            else if (predClean === 'away' || predClean === '2') predClean = '2';
-            else if (predClean === 'draw' || predClean === 'x') predClean = 'x';
+            if (predClean.includes('home win') || predClean === 'home' || predClean === '1') {
+                predClean = '1';
+            } else if (predClean.includes('away win') || predClean === 'away' || predClean === '2') {
+                predClean = '2';
+            } else if (predClean.includes('draw') || predClean === 'x') {
+                predClean = 'x';
+            }
 
             return predClean.includes(matchOutcome) ? 'win-green' : 'loss-red';
         }
 
-        function createModeCell(r, colPred, colModel, colProb, colProbExtra, result) {
-            let pred = getVal(r, colPred) || '-'; let model = getVal(r, colModel) || '-';
-            let prob = getVal(r, colProb) || '-'; let probX = getVal(r, colProbExtra) || '-';
+        function createModeCell(r, colPred, colModel, colProb, colProbExtra, result, occurrence = 0) {
+            let pred = getVal(r, colPred, occurrence) || '-'; 
+            let model = getVal(r, colModel) || '-';
+            let prob = getVal(r, colProb) || '-'; 
+            let probX = getVal(r, colProbExtra) || '-';
             let colorClass = getOutcomeColorClass(pred, result);
 
             return `
@@ -768,12 +1097,142 @@
             `;
         }
 
+        function calculateModelWins(data) {
+            let wins = [0, 0, 0, 0, 0];
+            let totalValid = [0, 0, 0, 0, 0];
+            
+            const modelConfigs = [
+                { predCol: 'Prediction', occurrence: 0 },         // Model 1: Prediction
+                { predCol: 'Model Prediction', occurrence: 0 },   // Model 2: Model Prediction (first occurrence)
+                { predCol: 'Match Prediction Tip', occurrence: 0 }, // Model 3: Match Prediction Tip
+                { predCol: 'Model Prediction', occurrence: 1 },   // Model 4: Model Prediction (second occurrence)
+                { predCol: 'Match outcome Prediction', occurrence: 0 } // Model 5: Match outcome Prediction
+            ];
+
+            data.forEach(row => {
+                const result = getVal(row, 'Match Result');
+                if (!result || result.trim() === '' || !result.includes('-')) return;
+
+                modelConfigs.forEach((cfg, idx) => {
+                    const pred = getVal(row, cfg.predCol, cfg.occurrence);
+                    if (pred && pred !== '-') {
+                        totalValid[idx]++;
+                        if (getOutcomeColorClass(pred, result) === 'win-green') {
+                            wins[idx]++;
+                        }
+                    }
+                });
+            });
+
+            return { wins, totalValid };
+        }
+
+        function renderAnalysisTab() {
+            const data = globalData.filter(row => matchAnalysisRowFilters(row));
+            
+            const models = [
+                { name: 'Model 1', predCol: 'Prediction', occurrence: 0, modelCol: 'Model 1' },
+                { name: 'Model 2', predCol: 'Model Prediction', occurrence: 0, modelCol: 'Model 2' },
+                { name: 'Model 3', predCol: 'Match Prediction Tip', occurrence: 0, modelCol: 'Model 3' },
+                { name: 'Model 4', predCol: 'Model Prediction', occurrence: 1, modelCol: 'Model 4' },
+                { name: 'Model 5', predCol: 'Match outcome Prediction', occurrence: 0, modelCol: 'Model 5' }
+            ];
+
+            let stats = models.map(m => ({
+                name: m.name,
+                predCol: m.predCol,
+                overallWin: 0, overallTotal: 0,
+                homeWin: 0, homeTotal: 0,
+                drawWin: 0, drawTotal: 0,
+                awayWin: 0, awayTotal: 0
+            }));
+
+            data.forEach(row => {
+                const result = getVal(row, 'Match Result');
+                const actual = getActualOutcome(result);
+                if (!actual) return;
+
+                models.forEach((m, idx) => {
+                    const rawPred = getVal(row, m.predCol, m.occurrence);
+                    const predNorm = normalizePrediction(rawPred);
+                    if (!predNorm) return;
+
+                    stats[idx].overallTotal++;
+                    if (predNorm === actual) {
+                        stats[idx].overallWin++;
+                    }
+
+                    if (actual === '1') {
+                        stats[idx].homeTotal++;
+                        if (predNorm === '1') stats[idx].homeWin++;
+                    } else if (actual === 'X') {
+                        stats[idx].drawTotal++;
+                        if (predNorm === 'X') stats[idx].drawWin++;
+                    } else if (actual === '2') {
+                        stats[idx].awayTotal++;
+                        if (predNorm === '2') stats[idx].awayWin++;
+                    }
+                });
+            });
+
+            const renderRankingTable = (tbodyId, winKey, totalKey, isOverall = false) => {
+                const tbody = document.getElementById(tbodyId);
+                if (!tbody) return;
+                tbody.innerHTML = '';
+
+                let sorted = [...stats].map(s => {
+                    const tot = s[totalKey];
+                    const w = s[winKey];
+                    const rate = tot > 0 ? (w / tot) * 100 : 0;
+                    const score = (w * 10) + (tot * 0.1);
+                    return { ...s, rate, tot, w, score };
+                }).sort((a, b) => b.rate - a.rate || b.w - a.w);
+
+                if (sorted.length === 0 || sorted.every(s => s[totalKey] === 0)) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-gray-400">No match results available for analysis</td></tr>`;
+                    return;
+                }
+
+                sorted.forEach((item, index) => {
+                    const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+                    const rowClass = index === 0 ? 'bg-amber-50 font-semibold' : '';
+                    const nameLabel = isOverall ? `${item.name} <span class="text-xs font-normal text-gray-500">(${item.predCol})</span>` : item.name;
+                    
+                    tbody.innerHTML += `
+                        <tr class="${rowClass}">
+                            <td class="py-2.5 px-3 font-bold">${rankEmoji}</td>
+                            <td class="py-2.5 px-3 text-customNavy font-medium">${nameLabel}</td>
+                            <td class="py-2.5 px-3 text-center">${item[winKey]} / ${item[totalKey]}</td>
+                            <td class="py-2.5 px-3 text-center font-bold text-emerald-700">${item.rate.toFixed(1)}%</td>
+                            <td class="py-2.5 px-3 text-center font-semibold text-indigo-900">${item.score.toFixed(1)}</td>
+                        </tr>
+                    `;
+                });
+            };
+
+            renderRankingTable('analysis-overall-tbody', 'overallWin', 'overallTotal', true);
+            renderRankingTable('analysis-home-tbody', 'homeWin', 'homeTotal', false);
+            renderRankingTable('analysis-draw-tbody', 'drawWin', 'drawTotal', false);
+            renderRankingTable('analysis-away-tbody', 'awayWin', 'awayTotal', false);
+        }
+
         function renderTable(type) {
             const tbody = document.getElementById(`table-body-${type}`);
             if (!tbody) return;
             const data = type === 'all' ? filteredAllData : filteredBestData;
             const page = type === 'all' ? allPage : bestPage;
             
+            const stats = calculateModelWins(data);
+            for (let i = 0; i < 5; i++) {
+                const summaryEl = document.getElementById(`summary-${type}-m${i+1}`);
+                if (summaryEl) {
+                    const count = stats.wins[i];
+                    const total = stats.totalValid[i];
+                    const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+                    summaryEl.textContent = `M${i+1}: ${count}/${total} (${pct}%)`;
+                }
+            }
+
             tbody.innerHTML = '';
             const start = (page - 1) * ROWS_PER_PAGE;
             const end = Math.min(start + ROWS_PER_PAGE, data.length);
@@ -787,15 +1246,15 @@
                 
                 const home = getVal(r, 'Home Team'); const away = getVal(r, 'Away Team'); const result = getVal(r, 'Match Result');
                 
-                let m1 = createModeCell(r, 'Prediction', 'Model 1', 'Confidence %', 'Model 1 prob', result);
-                let m2 = createModeCell(r, 'Model Prediction', 'Model 2', 'Model Prob %', 'Model 2 prob', result);
-                let m3 = createModeCell(r, 'Match Prediction Tip', 'Model 3', 'Prediction Likely', 'Model 3 prob', result);
-                let m4 = createModeCell(r, 'Model Prediction', 'Model 4', 'Model Prob %', 'Model 4 prob', result);
-                let m5 = createModeCell(r, 'Match outcome Prediction', 'Model 5', 'Match outcome chance', 'Model 5 prob', result);
+                let m1 = createModeCell(r, 'Prediction', 'Model 1', 'Confidence %', 'Model 1 prob', result, 0);
+                let m2 = createModeCell(r, 'Model Prediction', 'Model 2', 'Model Prob %', 'Model 2 prob', result, 0);
+                let m3 = createModeCell(r, 'Match Prediction Tip', 'Model 3', 'Prediction Likely', 'Model 3 prob', result, 0);
+                let m4 = createModeCell(r, 'Model Prediction', 'Model 4', 'Model Prob %', 'Model 4 prob', result, 1);
+                let m5 = createModeCell(r, 'Match outcome Prediction', 'Model 5', 'Match outcome chance', 'Model 5 prob', result, 0);
 
                 tr.innerHTML = `
-                    <td class="py-2 px-3 border-b font-semibold text-customNavy">${home}</td>
-                    <td class="py-2 px-3 border-b font-semibold text-gray-800">${away}</td>
+                    <td class="py-2 px-3 border-b font-semibold text-customNavy max-w-[140px] truncate" title="${home}">${home}</td>
+                    <td class="py-2 px-3 border-b font-semibold text-gray-800 max-w-[140px] truncate" title="${away}">${away}</td>
                     ${m1} ${m2} ${m3} ${m4} ${m5}
                     <td class="py-2 px-3 border-b text-center font-bold text-lg">${result || '-'}</td>
                     <td class="py-2 px-3 border-b text-center">
@@ -841,7 +1300,6 @@
             
             let matchUrl = getVal(r, 'Match URL');
 
-            // Prominent Match Result & URL Block
             content.innerHTML += `
                 <div class="col-span-1 md:col-span-2 lg:col-span-3 bg-white p-4 rounded-lg shadow-sm border border-blue-200 flex flex-col items-center justify-center">
                     <span class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Match Result</span>
@@ -857,7 +1315,7 @@
                                 </h4>
                                 <div class="space-y-2">`;
                 fields.forEach(f => {
-                    if (f === 'Match URL' || f === 'Match Result') return; // Handled in header
+                    if (f === 'Match URL' || f === 'Match Result') return;
                     let val = getVal(r, f) || '-';
                     html += `
                         <div class="flex justify-between items-center py-1 border-b border-gray-50 last:border-0">
@@ -869,7 +1327,6 @@
                 return html;
             };
 
-            // Arranging fields side-by-side logically
             content.innerHTML += renderGroup('Odds & Market', ['Home Odds', 'Draw Odds', 'Away Odds']);
             content.innerHTML += renderGroup('Form & Ratings', ['Home Form', 'Away Form', 'Form Difference', 'Home Form Rate', 'Away Form Rate']);
             content.innerHTML += renderGroup('Form Wins', ['Home Form Wins', 'Away Form Wins', 'Form Wins Difference']);
@@ -878,9 +1335,8 @@
             content.innerHTML += renderGroup('Head to Head (H2H)', ['H2H Home Wins', 'H2H Draw', 'H2H Away Wins', 'H2H Difference']);
             content.innerHTML += renderGroup('Predictions & Models', ['Confidence %', 'Correct Score', 'Prediction Likely', 'Level Of Confidence', 'Match outcome category']);
             
-            // Catch any remaining fields that weren't specifically grouped
             const handledFields = new Set([
-                'Match URL', 'Match Result', // Added these here so they aren't repeated
+                'Match URL', 'Match Result',
                 'Home Odds', 'Draw Odds', 'Away Odds', 'Home Form', 'Away Form', 'Form Difference', 'Home Form Rate', 'Away Form Rate',
                 'Home Form Wins', 'Away Form Wins', 'Form Wins Difference', 'Home Scored Avg', 'Away Scored Avg', 'Scored Difference',
                 'Home Conceded Avg', 'Away Conceded Avg', 'Conceded Difference', 'Home Power', 'Away Power', 'Power Difference',
@@ -914,7 +1370,6 @@
         }
         function applyAdvFilters() { applyAllMatchesFilters(); closeAdvFilters(); }
 
-        // Best Matches Adv Filters logic
         function openBmAdvFilters() {
             document.getElementById('bm-adv-filter-modal').classList.remove('hidden');
             document.getElementById('bm-adv-filter-modal').classList.add('flex');
