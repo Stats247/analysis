@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataCompas360</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        customBlue: '#1D4ED8', /* blue-700 */
+                        customGreen: '#15803D', /* green-700 */
+                        customTeal: '#0F766E', /* teal-700 */
+                        customNavy: '#1E3A8A', /* blue-900 */
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f0fdf4; color: #1e293b; }
+        .tab-btn { transition: all 0.3s; }
+        .tab-btn.active { background-color: #1E3A8A; color: white; border-bottom: 4px solid #0F766E; }
+        .hidden-content { display: none; }
+        
+        /* Custom Scrollbar for tables */
+        .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f1f1; }
+        .table-container::-webkit-scrollbar-thumb { background: #0F766E; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #1D4ED8; }
+
+        /* Loader */
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1E3A8A;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        th { white-space: nowrap; position: sticky; top: 0; background-color: #1E3A8A; color: white; z-index: 10; }
+        td { white-space: nowrap; }
+        
+        /* Modal Styles */
+        .modal-overlay { background-color: rgba(0,0,0,0.5); z-index: 50; }
+        .win-green { background-color: #dcfce7 !important; color: #166534; font-weight: bold;}
+        .loss-red { background-color: #fee2e2 !important; color: #991b1b; font-weight: bold;}
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col h-screen">
+
+    <nav class="bg-customNavy text-white p-4 shadow-md flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-3">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l1.5 4.5 4.5 1.5-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22a10 10 0 100-20 10 10 0 000 20z"></path>
+            </svg>
+            <h1 class="text-2xl font-bold tracking-wider text-white">DataCompas<span class="text-customTeal">360</span></h1>
+        </div>
+        <div class="space-x-2">
+            <button onclick="switchTab('all-matches')" id="tab-all-matches" class="tab-btn active px-4 py-2 rounded-t-lg bg-white/10 hover:bg-white/20">All Matches</button>
+            <button onclick="switchTab('best-matches')" id="tab-best-matches" class="tab-btn px-4 py-2 rounded-t-lg bg-white/10 hover:bg-white/20">Best Matches</button>
+            <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn px-4 py-2 rounded-t-lg bg-white/10 hover:bg-white/20">Settings</button>
+        </div>
+    </nav>
+
+    <div id="loader" class="loader mt-10"></div>
+    <div id="error-message" class="text-red-500 text-center mt-5 hidden font-bold"></div>
+
+    <main class="flex-1 overflow-hidden p-4">
+        <div id="content-all-matches" class="h-full flex flex-col bg-white rounded-lg shadow p-4">
+            <div class="mb-4 flex flex-col border-b pb-2">
+                <div class="flex justify-between items-center w-full mb-2">
+                    <h2 class="text-xl font-bold text-customNavy">All Matches Filter</h2>
+                    <div class="flex space-x-2">
+                        <button onclick="openAdvFilters()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-3 py-1 rounded text-sm border border-indigo-300">
+                            ⚙️ Advanced Filters
+                        </button>
+                        <button onclick="resetAllMatchesFilters()" class="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm">Clear Filters</button>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 items-center w-full">
+                    <input type="date" id="filter-date" class="border p-1 rounded text-sm w-36 focus:outline-customTeal" title="Date (MM/DD/YYYY linked)">
+                    
+                    <select id="filter-month" class="border p-1 rounded text-sm w-32 focus:outline-customTeal">
+                        <option value="">All Months</option>
+                        <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+                        <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+                        <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+                        <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                    </select>
+
+                    <select id="filter-league" class="border p-1 rounded text-sm w-36 focus:outline-customTeal">
+                        <option value="">All Leagues</option>
+                    </select>
+
+                    <select id="filter-prediction" class="border p-1 rounded text-sm w-36 focus:outline-customTeal">
+                        <option value="">All Predictions</option>
+                    </select>
+
+                    <div class="flex items-center space-x-1 border p-1 rounded text-sm bg-gray-50">
+                        <span class="text-xs text-gray-500">Home Rate:</span>
+                        <input type="number" step="0.01" id="filter-home-form-min" placeholder="Min" class="w-16 border rounded px-1 text-xs">
+                        <span>-</span>
+                        <input type="number" step="0.01" id="filter-home-form-max" placeholder="Max" class="w-16 border rounded px-1 text-xs">
+                    </div>
+
+                    <div class="flex items-center space-x-1 border p-1 rounded text-sm bg-gray-50">
+                        <span class="text-xs text-gray-500">Away Rate:</span>
+                        <input type="number" step="0.01" id="filter-away-form-min" placeholder="Min" class="w-16 border rounded px-1 text-xs">
+                        <span>-</span>
+                        <input type="number" step="0.01" id="filter-away-form-max" placeholder="Max" class="w-16 border rounded px-1 text-xs">
+                    </div>
+                    
+                    <div class="flex items-center ml-auto">
+                        <input type="text" id="search-team" placeholder="Search Home/Away Team..." class="border-2 border-customTeal p-1 rounded text-sm w-48 focus:outline-customBlue">
+                    </div>
+                    
+                    <button onclick="applyAllMatchesFilters()" class="bg-customBlue hover:bg-blue-800 text-white px-3 py-1 rounded text-sm w-full md:w-auto mt-2 lg:mt-0">Apply</button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-auto table-container border rounded">
+                <table class="min-w-full bg-white text-sm">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-3 border-b text-left">Home Team</th>
+                            <th class="py-2 px-3 border-b text-left">Away Team</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30">Mode 1<br><span class="text-xs font-normal">Pred | Model 1 | Conf % | Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30">Mode 2<br><span class="text-xs font-normal">Pred | Model 2 | Prob % | Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30">Mode 3<br><span class="text-xs font-normal">Tip | Model 3 | Likely | Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30">Mode 4<br><span class="text-xs font-normal">Pred | Model 4 | Prob % | Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30">Mode 5<br><span class="text-xs font-normal">Pred | Model 5 | Chance | Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center">Match Result</th>
+                            <th class="py-2 px-3 border-b text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body-all" class="text-gray-700"></tbody>
+                </table>
+            </div>
+            
+            <div class="mt-2 flex justify-between items-center shrink-0">
+                <span class="text-sm text-gray-600" id="page-info-all">Showing 0-0 of 0</span>
+                <div class="space-x-2">
+                    <button onclick="prevPage('all')" class="bg-customNavy text-white px-3 py-1 rounded disabled:opacity-50">Back</button>
+                    <button onclick="nextPage('all')" class="bg-customNavy text-white px-3 py-1 rounded disabled:opacity-50">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-best-matches" class="hidden-content h-full flex flex-col bg-white rounded-lg shadow p-4">
+            <div class="mb-4 flex flex-col border-b pb-2">
+                <div class="flex justify-between items-center w-full mb-2">
+                    <h2 class="text-xl font-bold text-customGreen">Best Matches (Thresholds Applied)</h2>
+                    <div class="flex space-x-2">
+                        <button onclick="openBmAdvFilters()" class="bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded text-sm border border-green-300">
+                            ⚙️ Advanced Filters
+                        </button>
+                        <button onclick="resetBestMatchesFilters()" class="bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm">Clear Filters</button>
+                    </div>
+                </div>
+                 <div class="flex flex-wrap gap-2 items-center w-full">
+                    <input type="date" id="bm-filter-date" class="border p-1 rounded text-sm w-36 focus:outline-customTeal">
+                    
+                    <select id="bm-filter-month" class="border p-1 rounded text-sm w-32 focus:outline-customTeal">
+                        <option value="">All Months</option>
+                        <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+                        <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+                        <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+                        <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                    </select>
+
+                    <select id="bm-filter-league" class="border p-1 rounded text-sm w-36 focus:outline-customTeal">
+                        <option value="">All Leagues</option>
+                    </select>
+
+                    <select id="bm-filter-prediction" class="border p-1 rounded text-sm w-36 focus:outline-customTeal">
+                        <option value="">All Predictions</option>
+                    </select>
+                    
+                    <div class="flex items-center ml-auto">
+                        <input type="text" id="bm-search-team" placeholder="Search Home/Away Team..." class="border-2 border-customTeal p-1 rounded text-sm w-48 focus:outline-customGreen">
+                    </div>
+                    
+                    <button onclick="applyBestMatchesFilters()" class="bg-customGreen hover:bg-green-800 text-white px-3 py-1 rounded text-sm w-full md:w-auto mt-2 lg:mt-0">Apply</button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-auto table-container border rounded">
+                <table class="min-w-full bg-white text-sm">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-3 border-b text-left bg-customGreen">Home Team</th>
+                            <th class="py-2 px-3 border-b text-left bg-customGreen">Away Team</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen">Mode 1</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen">Mode 2</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen">Mode 3</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen">Mode 4</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen">Mode 5</th>
+                            <th class="py-2 px-3 border-b text-center bg-customGreen">Match Result</th>
+                            <th class="py-2 px-3 border-b text-center bg-customGreen">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body-best" class="text-gray-700"></tbody>
+                </table>
+            </div>
+            
+            <div class="mt-2 flex justify-between items-center shrink-0">
+                <span class="text-sm text-gray-600" id="page-info-best">Showing 0-0 of 0</span>
+                <div class="space-x-2">
+                    <button onclick="prevPage('best')" class="bg-customGreen text-white px-3 py-1 rounded disabled:opacity-50">Back</button>
+                    <button onclick="nextPage('best')" class="bg-customGreen text-white px-3 py-1 rounded disabled:opacity-50">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-settings" class="hidden-content h-full flex flex-col bg-white rounded-lg shadow p-4 overflow-hidden">
+            <div class="flex justify-between items-center border-b pb-2 mb-4 shrink-0">
+                <h2 class="text-xl font-bold text-customTeal">Threshold Settings for Best Matches</h2>
+                <div class="text-sm text-gray-500">Configure parameters, mins, and maxes. <b>Note:</b> Saving applies thresholds to your local session.</div>
+            </div>
+            
+            <div class="flex-1 overflow-auto bg-white rounded-lg p-4 shadow-inner border">
+                <!-- Multi-column table header -->
+                <div class="hidden lg:grid grid-cols-2 gap-x-8 mb-2 border-b-2 border-gray-200 pb-2 bg-gray-50 px-2">
+                    <div class="grid grid-cols-[1fr_80px_80px] gap-2 font-bold text-gray-700 text-sm uppercase tracking-wide">
+                        <div>Parameter</div><div class="text-center">Min</div><div class="text-center">Max</div>
+                    </div>
+                    <div class="grid grid-cols-[1fr_80px_80px] gap-2 font-bold text-gray-700 text-sm uppercase tracking-wide">
+                        <div>Parameter</div><div class="text-center">Min</div><div class="text-center">Max</div>
+                    </div>
+                </div>
+                <!-- Mobile header -->
+                <div class="lg:hidden grid grid-cols-[1fr_80px_80px] gap-2 font-bold text-gray-700 text-sm uppercase tracking-wide border-b-2 border-gray-200 pb-2 mb-2 bg-gray-50 px-2">
+                    <div>Parameter</div><div class="text-center">Min</div><div class="text-center">Max</div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-1" id="settings-grid">
+                    <!-- Settings inputs injected here via JS -->
+                </div>
+            </div>
+            
+            <div class="mt-4 flex justify-end space-x-2 border-t pt-4 shrink-0">
+                <button onclick="resetSettingsDefaults()" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded">Clear Locally</button>
+                <button onclick="applySettingsLocally()" class="bg-customTeal hover:bg-teal-800 text-white px-4 py-2 rounded">Save & Apply Locally</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="view-modal" class="fixed inset-0 modal-overlay hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
+            <div class="bg-customNavy text-white p-4 rounded-t-xl flex justify-between items-center">
+                <h3 class="text-xl font-bold" id="modal-title">Match Details</h3>
+                <button onclick="closeModal('view-modal')" class="text-white hover:text-gray-300 font-bold text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-6 overflow-auto flex-1 bg-gray-100">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modal-content">
+                    <!-- Side-by-side modal data injected here -->
+                </div>
+            </div>
+            <div class="p-4 border-t text-right bg-white rounded-b-xl shrink-0">
+                <button onclick="closeModal('view-modal')" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded shadow">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALL MATCHES ADV FILTER MODAL -->
+    <div id="adv-filter-modal" class="fixed inset-0 modal-overlay hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="bg-indigo-800 text-white p-4 rounded-t-xl flex justify-between items-center">
+                <h3 class="text-lg font-bold">Advanced Filters (All Matches) - Min & Max Criteria</h3>
+                <button onclick="closeAdvFilters()" class="text-white hover:text-gray-300 font-bold text-xl">&times;</button>
+            </div>
+            <div class="p-4 overflow-auto flex-1 bg-gray-50">
+                <p class="text-xs text-gray-500 mb-4">Set Min and/or Max values for the fields below to refine your search.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="adv-filter-grid"></div>
+            </div>
+            <div class="p-4 border-t flex justify-end space-x-2 bg-white rounded-b-xl">
+                <button onclick="clearAdvFilters()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">Clear Advanced</button>
+                <button onclick="applyAdvFilters()" class="bg-customBlue hover:bg-blue-700 text-white px-4 py-2 rounded">Apply & Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEST MATCHES ADV FILTER MODAL -->
+    <div id="bm-adv-filter-modal" class="fixed inset-0 modal-overlay hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="bg-customGreen text-white p-4 rounded-t-xl flex justify-between items-center">
+                <h3 class="text-lg font-bold">Advanced Filters (Best Matches) - Min & Max Criteria</h3>
+                <button onclick="closeBmAdvFilters()" class="text-white hover:text-gray-300 font-bold text-xl">&times;</button>
+            </div>
+            <div class="p-4 overflow-auto flex-1 bg-gray-50">
+                <p class="text-xs text-gray-500 mb-4">Set Min and/or Max values for the fields below to refine your BEST match search.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="bm-adv-filter-grid"></div>
+            </div>
+            <div class="p-4 border-t flex justify-end space-x-2 bg-white rounded-b-xl">
+                <button onclick="clearBmAdvFilters()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded">Clear Advanced</button>
+                <button onclick="applyBmAdvFilters()" class="bg-customGreen hover:bg-green-800 text-white px-4 py-2 rounded">Apply & Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DATA_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS4skYgtxtfHuZElx4Mrx2n4NC0keZGjsKxgZNHOpPGrkVy2j_5GQWmyNlQu1y5TAjQKfDHAiBVknfi/pub?output=csv';
+        const SETTINGS_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1ZPDWEqN5dhGUsRkUDTFh2-osBnHf0aCkBUFHOOD_KHg/export?format=csv&gid=1001059226';
+        
+        const ROWS_PER_PAGE = 30;
+        
+        let globalData = [];
+        let filteredAllData = [];
+        let filteredBestData = [];
+        let allPage = 1;
+        let bestPage = 1;
+        let thresholds = {};
+        
+        const settingsFields = [
+            "Home Odds", "Draw Odds", "Away Odds", "Home Form", "Away Form", "Confidence %", 
+            "Correct Score", "H2H Home Wins", "H2H Draw", "H2H Away Wins", "Home Scored Avg", 
+            "Home Conceded Avg", "Away Scored Avg", "Away Conceded Avg", "Home Power", "Away Power", 
+            "Home Position", "Away Position", "Form Difference", "H2H Difference", "Position Difference", 
+            "Scored Difference", "Conceded Difference", "Power Difference", "Prediction Likely", 
+            "Level Of Confidence", "Match outcome category", "Home Form Wins", "Away Form Wins", 
+            "Form Wins Difference", "Home Form Rate", "Away Form Rate"
+        ];
+
+        const advFields = [
+            "Home Scored Avg", "Home Conceded Avg", "Away Scored Avg", "Away Conceded Avg", 
+            "Home Power", "Away Power", "Home Position", "Away Position", "Form Difference", 
+            "H2H Difference", "Position Difference", "Scored Difference", "Conceded Difference", 
+            "Power Difference", "H2H Home Wins", "H2H Draw", "H2H Away Wins"
+        ];
+
+        let headerMap = {};
+
+        window.onload = async () => {
+            initDateFilter();
+            generateSettingsUI();
+            generateAdvFiltersUI();
+            await loadData();
+        };
+
+        function initDateFilter() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const isoDate = `${yyyy}-${mm}-${dd}`;
+            const currentMonth = today.getMonth() + 1;
+
+            document.getElementById('filter-date').value = isoDate;
+            document.getElementById('bm-filter-date').value = isoDate;
+            document.getElementById('filter-month').value = currentMonth;
+            document.getElementById('bm-filter-month').value = currentMonth;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            
+            document.getElementById('content-all-matches').style.display = 'none';
+            document.getElementById('content-best-matches').style.display = 'none';
+            document.getElementById('content-settings').style.display = 'none';
+            document.getElementById('content-' + tabId).style.display = 'flex';
+        }
+
+        function showLoader(show) { document.getElementById('loader').style.display = show ? 'block' : 'none'; }
+        function showError(msg) {
+            const el = document.getElementById('error-message');
+            if(msg) { el.textContent = msg; el.classList.remove('hidden'); } 
+            else { el.classList.add('hidden'); }
+        }
+
+        async function fetchWithFallback(url) {
+            try { const response = await fetch(url); if (response.ok) return await response.text(); } catch (error) {}
+            try { const aoUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(url); const aoResponse = await fetch(aoUrl); if (aoResponse.ok) { const data = await aoResponse.json(); if (data.contents) return data.contents; } } catch (proxyError) {}
+            try { const ctUrl = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(url); const ctResponse = await fetch(ctUrl); if (ctResponse.ok) return await ctResponse.text(); } catch (proxyError2) {}
+            throw new Error(`All fetch attempts failed. Make sure you are connected to the internet and the sheet is public.`);
+        }
+
+        async function loadData() {
+            showLoader(true); showError('');
+            try {
+                await loadSettingsFromSheet();
+                const csvText = await fetchWithFallback(DATA_SHEET_URL);
+                if (!csvText || csvText.trim() === '') throw new Error("Data sheet is empty.");
+                parseCSVData(csvText);
+                populateDynamicDropdowns();
+                applyAllMatchesFilters();
+                applyBestMatchesFilters();
+            } catch (error) {
+                console.error("Error loading data:", error);
+                showError("Failed to load data. Ensure the Google Sheets are published correctly. (Error: " + error.message + ")");
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        async function loadSettingsFromSheet() {
+            try {
+                const csvText = await fetchWithFallback(SETTINGS_SHEET_URL);
+                parseSettingsCSV(csvText);
+                populateSettingsUI();
+            } catch (e) {
+                console.warn("Settings sheet fetch skipped, loading from local storage.", e);
+                loadSettingsFromLocalStorage();
+            }
+        }
+
+        function loadSettingsFromLocalStorage() {
+            const saved = localStorage.getItem('datacompas_thresholds');
+            if (saved) {
+                try { thresholds = JSON.parse(saved); populateSettingsUI(); } catch(err) {}
+            }
+        }
+
+        function parseCSV(text) {
+            const result = []; let row = []; let val = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                if (char === '"') {
+                    if (inQuotes && text[i+1] === '"') {
+                        val += '"'; i++; // skip escaped quote
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    row.push(val.trim()); val = '';
+                } else if (char === '\n' && !inQuotes) {
+                    row.push(val.trim()); result.push(row); row = []; val = '';
+                } else if (char !== '\r') {
+                    val += char;
+                }
+            }
+            if (val || row.length > 0) { row.push(val.trim()); result.push(row); }
+            return result;
+        }
+
+        function parseCSVData(csvText) {
+            const parsed = parseCSV(csvText);
+            if (parsed.length < 2) return;
+            const headers = parsed[0];
+            headerMap = {}; headers.forEach((h, i) => { headerMap[h.trim()] = i; });
+            globalData = [];
+            for (let i = 1; i < parsed.length; i++) {
+                if (parsed[i].length > 1 && parsed[i].join('').trim() !== '') globalData.push(parsed[i]);
+            }
+        }
+
+        function parseSettingsCSV(csvText) {
+            const parsed = parseCSV(csvText);
+            if (parsed.length < 2) return;
+            const hMap = {}; parsed[0].forEach((h, i) => { hMap[h.trim().toLowerCase()] = i; });
+            const nameIdx = hMap['field'] !== undefined ? hMap['field'] : 0;
+            const minIdx = hMap['min'] !== undefined ? hMap['min'] : 1;
+            const maxIdx = hMap['max'] !== undefined ? hMap['max'] : 2;
+
+            thresholds = {};
+            for (let i = 1; i < parsed.length; i++) {
+                const row = parsed[i];
+                if(row[nameIdx]) {
+                    thresholds[row[nameIdx].trim()] = { min: row[minIdx] ? row[minIdx] : '', max: row[maxIdx] ? row[maxIdx] : '' };
+                }
+            }
+        }
+
+        function populateDynamicDropdowns() {
+            const leaguesSet = new Set(); const predsSet = new Set();
+            globalData.forEach(row => {
+                const l = getVal(row, 'League'); const p = getVal(row, 'Prediction');
+                if (l) leaguesSet.add(l); if (p) predsSet.add(p);
+            });
+            const leagueSelects = [document.getElementById('filter-league'), document.getElementById('bm-filter-league')];
+            const predSelects = [document.getElementById('filter-prediction'), document.getElementById('bm-filter-prediction')];
+
+            leagueSelects.forEach(sel => {
+                if(!sel) return; const currentVal = sel.value;
+                sel.innerHTML = '<option value="">All Leagues</option>';
+                Array.from(leaguesSet).sort().forEach(lg => { const opt = document.createElement('option'); opt.value = lg; opt.textContent = lg; sel.appendChild(opt); });
+                sel.value = currentVal;
+            });
+
+            predSelects.forEach(sel => {
+                if(!sel) return; const currentVal = sel.value;
+                sel.innerHTML = '<option value="">All Predictions</option>';
+                Array.from(predsSet).sort().forEach(pr => { const opt = document.createElement('option'); opt.value = pr; opt.textContent = pr; sel.appendChild(opt); });
+                sel.value = currentVal;
+            });
+        }
+
+        function generateSettingsUI() {
+            const container = document.getElementById('settings-grid');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            settingsFields.forEach(field => {
+                const div = document.createElement('div');
+                div.className = 'grid grid-cols-[1fr_80px_80px] gap-2 items-center py-2 border-b border-gray-100 hover:bg-indigo-50 px-2 rounded transition-colors';
+                div.innerHTML = `
+                    <label class="text-sm font-semibold text-customNavy truncate pr-2" title="${field}">${field}</label>
+                    <input type="number" step="any" id="set-min-${field.replace(/\s+/g, '-')}" placeholder="Min" class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-customTeal w-full text-center">
+                    <input type="number" step="any" id="set-max-${field.replace(/\s+/g, '-')}" placeholder="Max" class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-customTeal w-full text-center">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function generateAdvFiltersUI() {
+            const advContainer = document.getElementById('adv-filter-grid');
+            const bmAdvContainer = document.getElementById('bm-adv-filter-grid');
+            if(!advContainer || !bmAdvContainer) return;
+            advContainer.innerHTML = '';
+            bmAdvContainer.innerHTML = '';
+            
+            advFields.forEach(field => {
+                const fId = field.replace(/\s+/g, '-');
+                // All Matches
+                advContainer.innerHTML += `
+                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100 flex flex-col">
+                        <label class="text-sm font-semibold text-indigo-800 mb-2 truncate" title="${field}">${field}</label>
+                        <div class="flex space-x-2">
+                            <input type="number" step="any" id="adv-min-${fId}" placeholder="Min" class="w-1/2 border rounded px-2 py-1 text-sm focus:outline-indigo-500">
+                            <input type="number" step="any" id="adv-max-${fId}" placeholder="Max" class="w-1/2 border rounded px-2 py-1 text-sm focus:outline-indigo-500">
+                        </div>
+                    </div>
+                `;
+                // Best Matches
+                bmAdvContainer.innerHTML += `
+                    <div class="bg-white p-3 rounded shadow-sm border border-gray-100 flex flex-col">
+                        <label class="text-sm font-semibold text-customGreen mb-2 truncate" title="${field}">${field}</label>
+                        <div class="flex space-x-2">
+                            <input type="number" step="any" id="bm-adv-min-${fId}" placeholder="Min" class="w-1/2 border rounded px-2 py-1 text-sm focus:outline-customGreen">
+                            <input type="number" step="any" id="bm-adv-max-${fId}" placeholder="Max" class="w-1/2 border rounded px-2 py-1 text-sm focus:outline-customGreen">
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function populateSettingsUI() {
+            settingsFields.forEach(field => {
+                const minInput = document.getElementById(`set-min-${field.replace(/\s+/g, '-')}`);
+                const maxInput = document.getElementById(`set-max-${field.replace(/\s+/g, '-')}`);
+                if (thresholds[field]) {
+                    if (minInput) minInput.value = thresholds[field].min || '';
+                    if (maxInput) maxInput.value = thresholds[field].max || '';
+                }
+            });
+        }
+
+        function applySettingsLocally() {
+            settingsFields.forEach(field => {
+                const minInput = document.getElementById(`set-min-${field.replace(/\s+/g, '-')}`);
+                const maxInput = document.getElementById(`set-max-${field.replace(/\s+/g, '-')}`);
+                thresholds[field] = {
+                    min: minInput ? minInput.value.trim() : '',
+                    max: maxInput ? maxInput.value.trim() : ''
+                };
+            });
+            localStorage.setItem('datacompas_thresholds', JSON.stringify(thresholds));
+            
+            // Show a brief success message
+            const btn = document.querySelector('button[onclick="applySettingsLocally()"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Saved!';
+            btn.classList.add('bg-green-600');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('bg-green-600');
+            }, 2000);
+
+            applyBestMatchesFilters();
+            switchTab('best-matches');
+        }
+
+        function resetSettingsDefaults() {
+            thresholds = {};
+            localStorage.removeItem('datacompas_thresholds');
+            settingsFields.forEach(field => {
+                const minInput = document.getElementById(`set-min-${field.replace(/\s+/g, '-')}`);
+                const maxInput = document.getElementById(`set-max-${field.replace(/\s+/g, '-')}`);
+                if(minInput) minInput.value = '';
+                if(maxInput) maxInput.value = '';
+            });
+            applyBestMatchesFilters();
+        }
+
+        function getVal(row, colName) {
+            const idx = headerMap[colName];
+            return idx !== undefined && idx < row.length ? row[idx] : '';
+        }
+
+        function parseSheetDate(dateStr) {
+            if (!dateStr) return null;
+            const partsSpace = dateStr.trim().split(/\s+/);
+            if (partsSpace.length >= 2) {
+                const day = parseInt(partsSpace[0], 10);
+                const monthStr = partsSpace[1].toLowerCase();
+                const monthMap = { 'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'may': 5, 'jun': 6, 'jul': 7, 'aug': 8, 'sep': 9, 'oct': 10, 'nov': 11, 'dec': 12 };
+                let month = monthMap[monthStr.substring(0, 3)];
+                if (month && !isNaN(day)) return { m: month, d: day, y: new Date().getFullYear() }; 
+            }
+            const parts = dateStr.split(/[-/]/);
+            if (parts.length >= 3) return { m: parseInt(parts[0]), d: parseInt(parts[1]), y: parseInt(parts[2]) };
+            return null;
+        }
+
+        function applyAllMatchesFilters() {
+            filteredAllData = globalData.filter(row => matchRowFilters(row, 'all'));
+            allPage = 1; renderTable('all');
+        }
+
+        function applyBestMatchesFilters() {
+            let temp = globalData.filter(row => matchRowFilters(row, 'best'));
+            filteredBestData = temp.filter(row => matchThresholds(row));
+            bestPage = 1; renderTable('best');
+        }
+
+        function resetAllMatchesFilters() {
+            document.getElementById('filter-league').value = '';
+            document.getElementById('filter-prediction').value = '';
+            document.getElementById('filter-home-form-min').value = '';
+            document.getElementById('filter-home-form-max').value = '';
+            document.getElementById('filter-away-form-min').value = '';
+            document.getElementById('filter-away-form-max').value = '';
+            document.getElementById('search-team').value = '';
+            initDateFilter();
+            clearAdvFilters(false);
+            applyAllMatchesFilters();
+        }
+
+        function resetBestMatchesFilters() {
+            document.getElementById('bm-filter-league').value = '';
+            document.getElementById('bm-filter-prediction').value = '';
+            document.getElementById('bm-search-team').value = '';
+            initDateFilter();
+            clearBmAdvFilters(false);
+            applyBestMatchesFilters();
+        }
+
+        function matchRowFilters(row, type) {
+            const prefix = type === 'all' ? '' : 'bm-';
+
+            const dDate = document.getElementById(prefix + 'filter-date').value;
+            const dMonth = document.getElementById(prefix + 'filter-month').value;
+            const dLeague = document.getElementById(prefix + 'filter-league').value.toLowerCase();
+            const dPred = document.getElementById(prefix + 'filter-prediction').value.toLowerCase();
+            const dSearch = document.getElementById(prefix + 'search-team').value.toLowerCase();
+
+            const rowDateParsed = parseSheetDate(getVal(row, 'Date'));
+            if (dMonth) { if (!rowDateParsed || rowDateParsed.m !== parseInt(dMonth)) return false; }
+            if (dDate) {
+                const [y, m, d] = dDate.split('-');
+                if (!rowDateParsed || rowDateParsed.y !== parseInt(y) || rowDateParsed.m !== parseInt(m) || rowDateParsed.d !== parseInt(d)) return false;
+            }
+
+            if (dLeague && (getVal(row, 'League')||'').toLowerCase() !== dLeague) return false;
+            if (dPred && (getVal(row, 'Prediction')||'').toLowerCase() !== dPred) return false;
+            
+            if (type === 'all') {
+                const hMin = document.getElementById('filter-home-form-min').value;
+                const hMax = document.getElementById('filter-home-form-max').value;
+                const aMin = document.getElementById('filter-away-form-min').value;
+                const aMax = document.getElementById('filter-away-form-max').value;
+                const hRate = parseFloat(getVal(row, 'Home Form Rate'));
+                const aRate = parseFloat(getVal(row, 'Away Form Rate'));
+
+                if (hMin !== '' && !isNaN(hRate) && hRate < parseFloat(hMin)) return false;
+                if (hMax !== '' && !isNaN(hRate) && hRate > parseFloat(hMax)) return false;
+                if (aMin !== '' && !isNaN(aRate) && aRate < parseFloat(aMin)) return false;
+                if (aMax !== '' && !isNaN(aRate) && aRate > parseFloat(aMax)) return false;
+            }
+
+            if (dSearch) {
+                const home = (getVal(row, 'Home Team')||'').toLowerCase();
+                const away = (getVal(row, 'Away Team')||'').toLowerCase();
+                if (!home.includes(dSearch) && !away.includes(dSearch)) return false;
+            }
+
+            // Advanced Modal Filters check
+            for (let f of advFields) {
+                const fId = f.replace(/\s+/g, '-');
+                const pfx = type === 'all' ? 'adv-' : 'bm-adv-';
+                const minEl = document.getElementById(`${pfx}min-${fId}`);
+                const maxEl = document.getElementById(`${pfx}max-${fId}`);
+                
+                const minVal = minEl ? minEl.value : '';
+                const maxVal = maxEl ? maxEl.value : '';
+                
+                if (minVal !== '' || maxVal !== '') {
+                    let cellVal = parseFloat(getVal(row, f));
+                    if (isNaN(cellVal)) return false;
+                    if (minVal !== '' && cellVal < parseFloat(minVal)) return false;
+                    if (maxVal !== '' && cellVal > parseFloat(maxVal)) return false;
+                }
+            }
+
+            return true;
+        }
+
+        function matchThresholds(row) {
+            let hasActiveThresholds = false;
+            for (const field of settingsFields) {
+                if (thresholds[field] && (thresholds[field].min !== '' || thresholds[field].max !== '')) {
+                    hasActiveThresholds = true;
+                    let cellVal = getVal(row, field);
+                    if (cellVal === '') return false;
+                    
+                    let numVal = parseFloat(cellVal.toString().replace('%',''));
+                    let minVal = thresholds[field].min !== '' ? parseFloat(thresholds[field].min) : null;
+                    let maxVal = thresholds[field].max !== '' ? parseFloat(thresholds[field].max) : null;
+
+                    if (!isNaN(numVal)) {
+                        if (minVal !== null && !isNaN(minVal) && numVal < minVal) return false;
+                        if (maxVal !== null && !isNaN(maxVal) && numVal > maxVal) return false;
+                    } else {
+                        if (minVal !== null && cellVal.toString().toLowerCase() !== thresholds[field].min.toLowerCase()) return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function getOutcomeColorClass(prediction, result) {
+            if (!prediction || !result) return '';
+            let predClean = prediction.toString().trim().toLowerCase();
+            let resultClean = result.toString().trim();
+            const parts = resultClean.split('-');
+            if (parts.length !== 2) return '';
+            const homeG = parseInt(parts[0]); const awayG = parseInt(parts[1]);
+            let matchOutcome = '';
+            
+            if (homeG > awayG) matchOutcome = '1';
+            else if (homeG < awayG) matchOutcome = '2';
+            else if (homeG === awayG) matchOutcome = 'x';
+            else return '';
+
+            if (predClean === 'home' || predClean === '1') predClean = '1';
+            else if (predClean === 'away' || predClean === '2') predClean = '2';
+            else if (predClean === 'draw' || predClean === 'x') predClean = 'x';
+
+            return predClean.includes(matchOutcome) ? 'win-green' : 'loss-red';
+        }
+
+        function createModeCell(r, colPred, colModel, colProb, colProbExtra, result) {
+            let pred = getVal(r, colPred) || '-'; let model = getVal(r, colModel) || '-';
+            let prob = getVal(r, colProb) || '-'; let probX = getVal(r, colProbExtra) || '-';
+            let colorClass = getOutcomeColorClass(pred, result);
+
+            return `
+                <td class="py-2 px-3 border-b text-center border-l border-gray-200">
+                    <div class="flex flex-col items-center">
+                        <span class="font-bold text-sm ${colorClass} px-1 rounded block w-full mb-1">${pred}</span>
+                        <div class="flex space-x-1 text-xs text-gray-500 w-full justify-center">
+                            <span title="Model" class="border-r pr-1">${model}</span>
+                            <span title="Prob 1" class="border-r pr-1">${prob}</span>
+                            <span title="Prob 2">${probX}</span>
+                        </div>
+                    </div>
+                </td>
+            `;
+        }
+
+        function renderTable(type) {
+            const tbody = document.getElementById(`table-body-${type}`);
+            if (!tbody) return;
+            const data = type === 'all' ? filteredAllData : filteredBestData;
+            const page = type === 'all' ? allPage : bestPage;
+            
+            tbody.innerHTML = '';
+            const start = (page - 1) * ROWS_PER_PAGE;
+            const end = Math.min(start + ROWS_PER_PAGE, data.length);
+            
+            const pageInfoEl = document.getElementById(`page-info-${type}`);
+            if(pageInfoEl) pageInfoEl.textContent = `Showing ${data.length > 0 ? start + 1 : 0}-${end} of ${data.length}`;
+
+            for (let i = start; i < end; i++) {
+                const r = data[i]; const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-100 transition-colors";
+                
+                const home = getVal(r, 'Home Team'); const away = getVal(r, 'Away Team'); const result = getVal(r, 'Match Result');
+                
+                let m1 = createModeCell(r, 'Prediction', 'Model 1', 'Confidence %', 'Model 1 prob', result);
+                let m2 = createModeCell(r, 'Model Prediction', 'Model 2', 'Model Prob %', 'Model 2 prob', result);
+                let m3 = createModeCell(r, 'Match Prediction Tip', 'Model 3', 'Prediction Likely', 'Model 3 prob', result);
+                let m4 = createModeCell(r, 'Model Prediction', 'Model 4', 'Model Prob %', 'Model 4 prob', result);
+                let m5 = createModeCell(r, 'Match outcome Prediction', 'Model 5', 'Match outcome chance', 'Model 5 prob', result);
+
+                tr.innerHTML = `
+                    <td class="py-2 px-3 border-b font-semibold text-customNavy">${home}</td>
+                    <td class="py-2 px-3 border-b font-semibold text-gray-800">${away}</td>
+                    ${m1} ${m2} ${m3} ${m4} ${m5}
+                    <td class="py-2 px-3 border-b text-center font-bold text-lg">${result || '-'}</td>
+                    <td class="py-2 px-3 border-b text-center">
+                        <button onclick='viewDetails(${i}, "${type}")' class="bg-customTeal hover:bg-teal-800 text-white text-xs px-3 py-1.5 rounded shadow">View</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+            
+            const tableContainer = tbody.closest('.table-container');
+            if (tableContainer && tableContainer.nextElementSibling) {
+                const btns = tableContainer.nextElementSibling.querySelectorAll('button');
+                if (btns.length >= 2) {
+                    btns[0].disabled = page === 1;
+                    btns[1].disabled = end >= data.length;
+                }
+            }
+        }
+
+        function prevPage(type) {
+            if (type === 'all' && allPage > 1) { allPage--; renderTable('all'); }
+            if (type === 'best' && bestPage > 1) { bestPage--; renderTable('best'); }
+        }
+
+        function nextPage(type) {
+            const maxPageAll = Math.ceil(filteredAllData.length / ROWS_PER_PAGE);
+            const maxPageBest = Math.ceil(filteredBestData.length / ROWS_PER_PAGE);
+            if (type === 'all' && allPage < maxPageAll) { allPage++; renderTable('all'); }
+            if (type === 'best' && bestPage < maxPageBest) { bestPage++; renderTable('best'); }
+        }
+
+        function viewDetails(index, type) {
+            const data = type === 'all' ? filteredAllData : filteredBestData;
+            const r = data[index];
+            if (!r) return;
+
+            document.getElementById('modal-title').textContent = `${getVal(r, 'Home Team')} vs ${getVal(r, 'Away Team')}`;
+            const content = document.getElementById('modal-content');
+            content.innerHTML = '';
+
+            let result = getVal(r, 'Match Result');
+            if(!result || result.trim() === '') result = "Pending / Unknown";
+            
+            let matchUrl = getVal(r, 'Match URL');
+
+            // Prominent Match Result & URL Block
+            content.innerHTML += `
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 bg-white p-4 rounded-lg shadow-sm border border-blue-200 flex flex-col items-center justify-center">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Match Result</span>
+                    <span class="text-4xl font-extrabold text-blue-900 mb-2">${result}</span>
+                    ${matchUrl && matchUrl !== '-' ? `<a href="${matchUrl}" target="_blank" class="bg-blue-100 text-blue-800 hover:bg-blue-200 px-4 py-2 rounded-full text-sm font-semibold transition-colors mt-2 flex items-center gap-2">🔗 Open Match Link</a>` : '<span class="text-sm text-gray-400 mt-2">No Match URL available</span>'}
+                </div>
+            `;
+
+            const renderGroup = (title, fields) => {
+                let html = `<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                                <h4 class="font-bold text-customNavy mb-3 border-b pb-1 flex justify-between">
+                                    <span>${title}</span>
+                                </h4>
+                                <div class="space-y-2">`;
+                fields.forEach(f => {
+                    if (f === 'Match URL' || f === 'Match Result') return; // Handled in header
+                    let val = getVal(r, f) || '-';
+                    html += `
+                        <div class="flex justify-between items-center py-1 border-b border-gray-50 last:border-0">
+                            <span class="text-xs font-semibold text-gray-500 w-1/2 pr-2">${f}</span>
+                            <span class="text-sm font-bold text-gray-900 w-1/2 text-right truncate" title="${val}">${val}</span>
+                        </div>`;
+                });
+                html += `</div></div>`;
+                return html;
+            };
+
+            // Arranging fields side-by-side logically
+            content.innerHTML += renderGroup('Odds & Market', ['Home Odds', 'Draw Odds', 'Away Odds']);
+            content.innerHTML += renderGroup('Form & Ratings', ['Home Form', 'Away Form', 'Form Difference', 'Home Form Rate', 'Away Form Rate']);
+            content.innerHTML += renderGroup('Form Wins', ['Home Form Wins', 'Away Form Wins', 'Form Wins Difference']);
+            content.innerHTML += renderGroup('Goals (Averages)', ['Home Scored Avg', 'Away Scored Avg', 'Scored Difference', 'Home Conceded Avg', 'Away Conceded Avg', 'Conceded Difference']);
+            content.innerHTML += renderGroup('Power & Table Position', ['Home Power', 'Away Power', 'Power Difference', 'Home Position', 'Away Position', 'Position Difference']);
+            content.innerHTML += renderGroup('Head to Head (H2H)', ['H2H Home Wins', 'H2H Draw', 'H2H Away Wins', 'H2H Difference']);
+            content.innerHTML += renderGroup('Predictions & Models', ['Confidence %', 'Correct Score', 'Prediction Likely', 'Level Of Confidence', 'Match outcome category']);
+            
+            // Catch any remaining fields that weren't specifically grouped
+            const handledFields = new Set([
+                'Match URL', 'Match Result', // Added these here so they aren't repeated
+                'Home Odds', 'Draw Odds', 'Away Odds', 'Home Form', 'Away Form', 'Form Difference', 'Home Form Rate', 'Away Form Rate',
+                'Home Form Wins', 'Away Form Wins', 'Form Wins Difference', 'Home Scored Avg', 'Away Scored Avg', 'Scored Difference',
+                'Home Conceded Avg', 'Away Conceded Avg', 'Conceded Difference', 'Home Power', 'Away Power', 'Power Difference',
+                'Home Position', 'Away Position', 'Position Difference', 'H2H Home Wins', 'H2H Draw', 'H2H Away Wins', 'H2H Difference',
+                'Confidence %', 'Correct Score', 'Prediction Likely', 'Level Of Confidence', 'Match outcome category'
+            ]);
+            
+            const otherFields = settingsFields.filter(f => !handledFields.has(f));
+            if(otherFields.length > 0) {
+                 content.innerHTML += renderGroup('Other Settings Fields', otherFields);
+            }
+
+            document.getElementById('view-modal').classList.remove('hidden');
+            document.getElementById('view-modal').classList.add('flex');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        function openAdvFilters() {
+            document.getElementById('adv-filter-modal').classList.remove('hidden');
+            document.getElementById('adv-filter-modal').classList.add('flex');
+        }
+        function closeAdvFilters() { closeModal('adv-filter-modal'); }
+        function clearAdvFilters(apply = true) {
+            const inputs = document.getElementById('adv-filter-grid').querySelectorAll('input');
+            inputs.forEach(inp => inp.value = '');
+            if(apply) applyAllMatchesFilters();
+        }
+        function applyAdvFilters() { applyAllMatchesFilters(); closeAdvFilters(); }
+
+        // Best Matches Adv Filters logic
+        function openBmAdvFilters() {
+            document.getElementById('bm-adv-filter-modal').classList.remove('hidden');
+            document.getElementById('bm-adv-filter-modal').classList.add('flex');
+        }
+        function closeBmAdvFilters() { closeModal('bm-adv-filter-modal'); }
+        function clearBmAdvFilters(apply = true) {
+            const inputs = document.getElementById('bm-adv-filter-grid').querySelectorAll('input');
+            inputs.forEach(inp => inp.value = '');
+            if(apply) applyBestMatchesFilters();
+        }
+        function applyBmAdvFilters() { applyBestMatchesFilters(); closeBmAdvFilters(); }
+
+    </script>
+</body>
+</html>
