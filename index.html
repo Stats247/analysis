@@ -23,7 +23,6 @@
         body { font-family: 'Inter', sans-serif; background-color: #f0fdf4; color: #1e293b; }
         .tab-btn { transition: all 0.3s; }
         .tab-btn.active { background-color: #1E3A8A; color: white; border-bottom: 4px solid #0F766E; }
-        .hidden-content { display: none; }
         
         /* Custom Scrollbar for tables */
         .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -145,7 +144,6 @@
                 <span id="summary-all-m2" class="px-2 py-0.5 bg-blue-800 rounded">M2: 0/0</span>
                 <span id="summary-all-m3" class="px-2 py-0.5 bg-blue-800 rounded">M3: 0/0</span>
                 <span id="summary-all-m4" class="px-2 py-0.5 bg-blue-800 rounded">M4: 0/0</span>
-                <span id="summary-all-m5" class="px-2 py-0.5 bg-blue-800 rounded">M5: 0/0</span>
             </div>
 
             <!-- Table Container -->
@@ -155,11 +153,10 @@
                         <tr>
                             <th class="py-2 px-3 border-b text-left max-w-[140px] truncate bg-customNavy text-white">Home Team</th>
                             <th class="py-2 px-3 border-b text-left max-w-[140px] truncate bg-customNavy text-white">Away Team</th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 1<br><span class="text-xs font-normal">Prediction | Model 1 | Conf % | Mod 1 Prob</span></th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 2<br><span class="text-xs font-normal">Model Pred | Model 2 | Prob % | Mod 2 Prob</span></th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 3<br><span class="text-xs font-normal">Tip | Model 3 | Likely | Mod 3 Prob</span></th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 4<br><span class="text-xs font-normal">Model Pred | Model 4 | Prob % | Mod 4 Prob</span></th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 5<br><span class="text-xs font-normal">Outcome Pred | Model 5 | Chance | Mod 5 Prob</span></th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 1</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 2</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 3</th>
+                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customNavy text-white">Model 4</th>
                             <th class="py-2 px-3 border-b text-center bg-customNavy text-white">Match Result</th>
                             <th class="py-2 px-3 border-b text-center bg-customNavy text-white">Action</th>
                         </tr>
@@ -177,7 +174,7 @@
             </div>
         </div>
 
-        <div id="content-best-matches" class="hidden-content h-full flex flex-col bg-white rounded-lg shadow p-3 min-h-0">
+        <div id="content-best-matches" class="hidden h-full flex-col bg-white rounded-lg shadow p-3 min-h-0">
             <!-- Compact Filter Bar -->
             <div class="mb-2 bg-emerald-50/60 p-2 rounded-lg border border-emerald-200 shrink-0 flex flex-wrap items-center justify-between gap-2">
                 <div class="flex flex-wrap items-center gap-1.5">
@@ -215,7 +212,6 @@
                 <span id="summary-best-m2" class="px-2 py-0.5 bg-emerald-800 rounded">M2: 0/0</span>
                 <span id="summary-best-m3" class="px-2 py-0.5 bg-emerald-800 rounded">M3: 0/0</span>
                 <span id="summary-best-m4" class="px-2 py-0.5 bg-emerald-800 rounded">M4: 0/0</span>
-                <span id="summary-best-m5" class="px-2 py-0.5 bg-emerald-800 rounded">M5: 0/0</span>
             </div>
 
             <!-- Table Container -->
@@ -229,7 +225,6 @@
                             <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen text-white">Model 2</th>
                             <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen text-white">Model 3</th>
                             <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen text-white">Model 4</th>
-                            <th class="py-2 px-3 border-b text-center border-l border-white/30 bg-customGreen text-white">Model 5</th>
                             <th class="py-2 px-3 border-b text-center bg-customGreen text-white">Match Result</th>
                             <th class="py-2 px-3 border-b text-center bg-customGreen text-white">Action</th>
                         </tr>
@@ -247,11 +242,11 @@
             </div>
         </div>
 
-        <div id="content-analysis" class="hidden-content h-full flex flex-col bg-white rounded-lg shadow p-3 overflow-auto min-h-0">
+        <div id="content-analysis" class="hidden h-full flex-col bg-white rounded-lg shadow p-3 overflow-auto min-h-0">
             <div class="flex justify-between items-center border-b pb-2 mb-3 shrink-0">
                 <div>
                     <h2 class="text-lg font-bold text-customNavy">Model Performance & Outcome Analysis</h2>
-                    <p class="text-xs text-gray-500">Rankings of Model 1 through Model 5 based on prediction accuracy against match outcomes.</p>
+                    <p class="text-xs text-gray-500">Rankings of Model 1 through Model 4 based on prediction accuracy against match outcomes.</p>
                 </div>
                 <button onclick="renderAnalysisTab()" class="bg-customNavy hover:bg-blue-800 text-white px-3 py-1.5 rounded text-xs font-semibold shadow">🔄 Refresh Analysis</button>
             </div>
@@ -375,7 +370,7 @@
             </div>
         </div>
 
-        <div id="content-settings" class="hidden-content h-full flex flex-col bg-white rounded-lg shadow p-4 overflow-hidden min-h-0">
+        <div id="content-settings" class="hidden h-full flex-col bg-white rounded-lg shadow p-4 overflow-hidden min-h-0">
             <div class="flex justify-between items-center border-b pb-2 mb-3 shrink-0">
                 <h2 class="text-lg font-bold text-customTeal">Threshold Settings for Best Matches</h2>
                 <div class="text-xs text-gray-500">Configure parameters, mins, and maxes.</div>
@@ -532,11 +527,16 @@
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('tab-' + tabId).classList.add('active');
             
-            document.getElementById('content-all-matches').style.display = 'none';
-            document.getElementById('content-best-matches').style.display = 'none';
-            document.getElementById('content-analysis').style.display = 'none';
-            document.getElementById('content-settings').style.display = 'none';
-            document.getElementById('content-' + tabId).style.display = 'flex';
+            ['all-matches', 'best-matches', 'analysis', 'settings'].forEach(id => {
+                const el = document.getElementById('content-' + id);
+                if (id === tabId) {
+                    el.classList.remove('hidden');
+                    el.classList.add('flex');
+                } else {
+                    el.classList.remove('flex');
+                    el.classList.add('hidden');
+                }
+            });
 
             if (tabId === 'analysis') {
                 renderAnalysisTab();
@@ -680,7 +680,8 @@
             const headers = parsed[0];
             headerMap = {}; 
             headers.forEach((h, i) => { 
-                const key = h.trim();
+                // Normalize header keys: remove extra spaces and make lower case for reliable matching
+                const key = h.replace(/\s+/g, ' ').trim().toLowerCase();
                 if (!headerMap[key]) headerMap[key] = [];
                 headerMap[key].push(i);
             });
@@ -837,13 +838,13 @@
         }
 
         function getVal(row, colName, occurrence = 0) {
-            const indices = headerMap[colName];
+            const key = colName.replace(/\s+/g, ' ').trim().toLowerCase();
+            const indices = headerMap[key];
             if (indices && Array.isArray(indices)) {
                 const idx = indices[occurrence] !== undefined ? indices[occurrence] : indices[0];
                 return idx !== undefined && idx < row.length ? row[idx] : '';
             }
-            const idx = headerMap[colName];
-            return idx !== undefined && idx < row.length ? row[idx] : '';
+            return '';
         }
 
         function parseSheetDate(dateStr) {
@@ -1061,68 +1062,58 @@
         function normalizePrediction(pred) {
             if (!pred) return '';
             let p = pred.toString().trim().toLowerCase();
-            if (p.includes('home win') || p === 'home' || p === '1') return '1';
-            if (p.includes('away win') || p === 'away' || p === '2') return '2';
+            if (p.includes('home') || p === '1') return '1';
+            if (p.includes('away') || p === '2') return '2';
             if (p.includes('draw') || p === 'x') return 'X';
             return '';
         }
 
         function getOutcomeColorClass(prediction, result) {
-            if (!prediction || !result) return '';
+            if (!prediction || !result || result.trim() === '-' || result.trim() === '') return '';
             let predClean = prediction.toString().trim().toLowerCase();
             let resultClean = result.toString().trim();
             const parts = resultClean.split('-');
             if (parts.length !== 2) return '';
             const homeG = parseInt(parts[0]); const awayG = parseInt(parts[1]);
-            let matchOutcome = '';
+            if (isNaN(homeG) || isNaN(awayG)) return '';
             
+            let matchOutcome = '';
             if (homeG > awayG) matchOutcome = '1';
             else if (homeG < awayG) matchOutcome = '2';
             else if (homeG === awayG) matchOutcome = 'x';
             else return '';
 
-            if (predClean.includes('home win') || predClean === 'home' || predClean === '1') {
-                predClean = '1';
-            } else if (predClean.includes('away win') || predClean === 'away' || predClean === '2') {
-                predClean = '2';
-            } else if (predClean.includes('draw') || predClean === 'x') {
-                predClean = 'x';
-            }
+            if (predClean.includes('home') || predClean === '1') predClean = '1';
+            else if (predClean.includes('away') || predClean === '2') predClean = '2';
+            else if (predClean.includes('draw') || predClean === 'x') predClean = 'x';
 
-            return predClean.includes(matchOutcome) ? 'win-green' : 'loss-red';
+            return predClean === matchOutcome ? 'win-green' : 'loss-red';
         }
 
-        function createModeCell(r, colPred, colModel, colProb, colProbExtra, result, occurrence = 0) {
-            let pred = getVal(r, colPred, occurrence) || '-'; 
-            let model = getVal(r, colModel) || '-';
+        function createModeCell(r, colPred, colProb, result) {
+            let pred = getVal(r, colPred) || '-'; 
             let prob = getVal(r, colProb) || '-'; 
-            let probX = getVal(r, colProbExtra) || '-';
             let colorClass = getOutcomeColorClass(pred, result);
 
             return `
                 <td class="py-2 px-3 border-b text-center border-l border-gray-200">
                     <div class="flex flex-col items-center">
                         <span class="font-bold text-sm ${colorClass} px-1 rounded block w-full mb-1">${pred}</span>
-                        <div class="flex space-x-1 text-xs text-gray-500 w-full justify-center">
-                            <span title="Model" class="border-r pr-1">${model}</span>
-                            <span title="Prob 1" class="border-r pr-1">${prob}</span>
-                            <span title="Prob 2">${probX}</span>
-                        </div>
+                        <span class="text-xs text-gray-500 font-medium">${prob}</span>
                     </div>
                 </td>
             `;
         }
 
         function calculateModelWins(data) {
-            let wins = [0, 0, 0, 0, 0];
-            let totalValid = [0, 0, 0, 0, 0];
+            let wins = [0, 0, 0, 0];
+            let totalValid = [0, 0, 0, 0];
             
             const modelConfigs = [
-                { predCol: 'Prediction', occurrence: 0 },         
-                { predCol: 'Model Prediction', occurrence: 0 },   
-                { predCol: 'Match Prediction Tip', occurrence: 0 }, 
-                { predCol: 'Model Prediction', occurrence: 1 },   
-                { predCol: 'Match outcome Prediction', occurrence: 0 } 
+                { predCol: 'Prediction' },         
+                { predCol: 'Match Prediction Tip' },   
+                { predCol: 'Match outcome Prediction' }, 
+                { predCol: 'Model Prediction' } 
             ];
 
             data.forEach(row => {
@@ -1130,7 +1121,7 @@
                 if (!result || result.trim() === '' || !result.includes('-')) return;
 
                 modelConfigs.forEach((cfg, idx) => {
-                    const pred = getVal(row, cfg.predCol, cfg.occurrence);
+                    const pred = getVal(row, cfg.predCol);
                     if (pred && pred !== '-') {
                         totalValid[idx]++;
                         if (getOutcomeColorClass(pred, result) === 'win-green') {
@@ -1147,11 +1138,10 @@
             const data = globalData.filter(row => matchAnalysisRowFilters(row));
             
             const models = [
-                { name: 'Model 1', predCol: 'Prediction', occurrence: 0, modelCol: 'Model 1' },
-                { name: 'Model 2', predCol: 'Model Prediction', occurrence: 0, modelCol: 'Model 2' },
-                { name: 'Model 3', predCol: 'Match Prediction Tip', occurrence: 0, modelCol: 'Model 3' },
-                { name: 'Model 4', predCol: 'Model Prediction', occurrence: 1, modelCol: 'Model 4' },
-                { name: 'Model 5', predCol: 'Match outcome Prediction', occurrence: 0, modelCol: 'Model 5' }
+                { name: 'Model 1', predCol: 'Prediction' },
+                { name: 'Model 2', predCol: 'Match Prediction Tip' },
+                { name: 'Model 3', predCol: 'Match outcome Prediction' },
+                { name: 'Model 4', predCol: 'Model Prediction' }
             ];
 
             let stats = models.map(m => ({
@@ -1239,7 +1229,7 @@
             const page = type === 'all' ? allPage : bestPage;
             
             const stats = calculateModelWins(data);
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 4; i++) {
                 const summaryEl = document.getElementById(`summary-${type}-m${i+1}`);
                 if (summaryEl) {
                     const count = stats.wins[i];
@@ -1262,16 +1252,15 @@
                 
                 const home = getVal(r, 'Home Team'); const away = getVal(r, 'Away Team'); const result = getVal(r, 'Match Result');
                 
-                let m1 = createModeCell(r, 'Prediction', 'Model 1', 'Confidence %', 'Model 1 prob', result, 0);
-                let m2 = createModeCell(r, 'Model Prediction', 'Model 2', 'Model Prob %', 'Model 2 prob', result, 0);
-                let m3 = createModeCell(r, 'Match Prediction Tip', 'Model 3', 'Prediction Likely', 'Model 3 prob', result, 0);
-                let m4 = createModeCell(r, 'Model Prediction', 'Model 4', 'Model Prob %', 'Model 4 prob', result, 1);
-                let m5 = createModeCell(r, 'Match outcome Prediction', 'Model 5', 'Match outcome chance', 'Model 5 prob', result, 0);
+                let m1 = createModeCell(r, 'Prediction', 'Confidence %', result);
+                let m2 = createModeCell(r, 'Match Prediction Tip', 'Prediction Likely', result);
+                let m3 = createModeCell(r, 'Match outcome Prediction', 'Match outcome chance', result);
+                let m4 = createModeCell(r, 'Model Prediction', 'Model Prob %', result);
 
                 tr.innerHTML = `
                     <td class="py-2 px-3 border-b font-semibold text-customNavy max-w-[140px] truncate" title="${home}">${home}</td>
                     <td class="py-2 px-3 border-b font-semibold text-gray-800 max-w-[140px] truncate" title="${away}">${away}</td>
-                    ${m1} ${m2} ${m3} ${m4} ${m5}
+                    ${m1} ${m2} ${m3} ${m4}
                     <td class="py-2 px-3 border-b text-center font-bold text-lg">${result || '-'}</td>
                     <td class="py-2 px-3 border-b text-center">
                         <button onclick='viewDetails(${i}, "${type}")' class="bg-customTeal hover:bg-teal-800 text-white text-xs px-2.5 py-1 rounded shadow">View</button>
