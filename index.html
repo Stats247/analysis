@@ -22,7 +22,7 @@
             --brand-teal-dark: #0f766e;
             --brand-teal: #0d9488;
             --brand-teal-light: #14b8a6;
-            --brand-gold: #f59e0b;
+            --brand-white: #ffffff; /* Replaced gold with white */
             --brand-emerald: #10b981;
             --brand-rose: #f43f5e;
         }
@@ -69,7 +69,7 @@
             height: 48px;
             border-radius: 50%;
             border-left-color: #14b8a6;
-            border-top-color: #f59e0b;
+            border-top-color: #ffffff; /* Replaced gold with white */
             animation: spin 0.85s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
         }
         @keyframes spin {
@@ -86,12 +86,22 @@
             animation: spin-slow 12s linear infinite;
         }
 
-        /* Gold and Teal Border Glows */
-        .gold-border-glow {
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+        /* White and Teal Border Glows */
+        .white-border-glow {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.15); /* Replaced gold glow with white */
         }
         .teal-border-glow {
             box-shadow: 0 0 20px rgba(13, 148, 136, 0.18);
+        }
+
+        /* Date Picker Icon Invert for Dark Theme */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+            opacity: 0.8;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
         }
     </style>
 </head>
@@ -103,16 +113,16 @@
             
             <!-- Brand Logo & Title -->
             <div class="flex items-center space-x-3.5">
-                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-teal-600 via-teal-700 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-teal-950/40 animate-float border border-amber-400/30">
-                    <i class="fa-solid fa-compass text-2xl text-amber-300 animate-spin-slow"></i>
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-teal-600 via-teal-700 to-slate-400 flex items-center justify-center text-white shadow-lg shadow-teal-950/40 animate-float border border-slate-300/30">
+                    <i class="fa-solid fa-compass text-2xl text-white animate-spin-slow"></i>
                 </div>
                 <div>
                     <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
                         <span>Statarea Kickers</span>
-                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-xs">PRO</span>
+                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-slate-200 text-slate-900 shadow-xs">PRO</span>
                     </h1>
                     <p class="text-[11px] sm:text-xs font-medium text-teal-400 flex items-center gap-1.5">
-                        <i class="fa-solid fa-chart-line text-amber-400"></i>
+                        <i class="fa-solid fa-chart-line text-white"></i>
                         <span>Soccer Predictive Intelligence & Live Odds</span>
                     </p>
                 </div>
@@ -121,7 +131,7 @@
             <!-- Action Controls -->
             <div class="flex items-center space-x-2">
                 <button onclick="openSourceModal()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-database text-amber-400"></i>
+                    <i class="fa-solid fa-database text-white"></i>
                     <span class="hidden sm:inline">Data Source</span>
                 </button>
                 <button onclick="loadCSVData()" class="px-3.5 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-md shadow-teal-900/40">
@@ -170,7 +180,7 @@
                 <button onclick="loadCSVData()" class="px-5 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold text-xs transition shadow-md inline-flex items-center gap-2">
                     <i class="fa-solid fa-rotate-right"></i> Retry Sync
                 </button>
-                <button onclick="useFallbackSampleData()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-bold text-xs transition shadow-md inline-flex items-center gap-2">
+                <button onclick="useFallbackSampleData()" class="px-5 py-2.5 bg-slate-200 hover:bg-white text-slate-900 rounded-xl font-bold text-xs transition shadow-md inline-flex items-center gap-2">
                     <i class="fa-solid fa-database"></i> Load Sample Dataset
                 </button>
             </div>
@@ -205,12 +215,12 @@
                 </div>
 
                 <!-- Accuracy Win Rate -->
-                <div class="bg-slate-800/90 border border-slate-700/80 p-5 rounded-2xl shadow-sm flex items-center space-x-4 border-l-4 border-l-amber-500 gold-border-glow">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-950 text-amber-400 flex items-center justify-center text-xl font-bold border border-amber-800/60">
+                <div class="bg-slate-800/90 border border-slate-700/80 p-5 rounded-2xl shadow-sm flex items-center space-x-4 border-l-4 border-l-slate-200 white-border-glow">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-700 text-white flex items-center justify-center text-xl font-bold border border-slate-600">
                         <i class="fa-solid fa-bullseye"></i>
                     </div>
                     <div>
-                        <p class="text-[11px] font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                        <p class="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-1">
                             <span>Accuracy Rate</span>
                             <i class="fa-solid fa-star text-[10px]"></i>
                         </p>
@@ -236,7 +246,7 @@
                     <i class="fa-solid fa-table-list mr-1.5 text-xs"></i> All Fixtures
                 </button>
                 <button id="tabBetProb" onclick="switchTab('bet-prob')" class="px-5 py-2.5 bg-slate-800 text-slate-400 hover:text-white rounded-t-xl font-bold text-sm transition">
-                    <i class="fa-solid fa-fire mr-1.5 text-xs text-amber-500"></i> Bet Probability (Home > 58% or Away > 55%)
+                    <i class="fa-solid fa-fire mr-1.5 text-xs text-white"></i> Bet Probability (Home > 58% or Away > 55%)
                 </button>
             </div>
 
@@ -278,8 +288,8 @@
 
                     <!-- Tip Filter -->
                     <div>
-                        <label class="block text-[11px] font-extrabold text-amber-400 mb-1.5 uppercase tracking-wider">Prediction Tip</label>
-                        <select id="filterTip" onchange="applyFilters()" class="w-full bg-amber-950/20 border border-amber-800/60 focus:border-amber-500 text-amber-200 text-xs font-bold rounded-xl px-3 py-2.5 focus:outline-none transition">
+                        <label class="block text-[11px] font-extrabold text-slate-300 mb-1.5 uppercase tracking-wider">Prediction Tip</label>
+                        <select id="filterTip" onchange="applyFilters()" class="w-full bg-slate-800 border border-slate-600 focus:border-white text-slate-200 text-xs font-bold rounded-xl px-3 py-2.5 focus:outline-none transition">
                             <option value="">All Tips (1, X, 2, X2...)</option>
                         </select>
                     </div>
@@ -298,7 +308,9 @@
                     <!-- Specific Match Date -->
                     <div>
                         <label class="block text-[11px] font-extrabold text-slate-400 mb-1.5 uppercase tracking-wider">Match Date</label>
-                        <input type="date" id="filterDate" onchange="applyFilters()" class="w-full bg-slate-900 border border-slate-700 focus:border-teal-500 text-slate-100 text-xs font-medium rounded-xl px-3 py-2.5 focus:outline-none transition">
+                        <select id="filterDate" onchange="applyFilters()" class="w-full bg-slate-900 border border-slate-700 focus:border-teal-500 text-slate-100 text-xs font-medium rounded-xl px-3 py-2.5 focus:outline-none transition">
+                            <option value="">All Dates</option>
+                        </select>
                     </div>
 
                     <!-- Sort By Option -->
@@ -333,7 +345,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-extrabold text-amber-400 mb-1.5 uppercase tracking-wider">Away Probability (%)</label>
+                        <label class="block text-[11px] font-extrabold text-slate-300 mb-1.5 uppercase tracking-wider">Away Probability (%)</label>
                         <div class="flex items-center space-x-2">
                             <input type="number" id="filterAwayMin" oninput="applyFilters()" placeholder="Min %" min="0" max="100" class="w-1/2 bg-slate-900 border border-slate-700 focus:border-teal-500 text-slate-100 text-xs font-medium rounded-xl px-3 py-2.5 focus:outline-none transition">
                             <span class="text-slate-500 font-bold">-</span>
@@ -364,10 +376,10 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-900/80 text-slate-400 uppercase text-[10px] tracking-wider font-extrabold border-b border-slate-700/80">
-                                <th class="py-3.5 px-4 border-r border-slate-800">Date / Time</th>
+                                <th class="py-3.5 px-4 border-r border-slate-800">Match Date</th>
                                 <th class="py-3.5 px-4 border-r border-slate-800 text-teal-400">Home Team</th>
-                                <th class="py-3.5 px-4 border-r border-slate-800 text-amber-400">Away Team</th>
-                                <th class="py-3.5 px-4 border-r border-slate-800 text-center bg-amber-950/20 text-amber-300">Tip Prediction</th>
+                                <th class="py-3.5 px-4 border-r border-slate-800 text-white">Away Team</th>
+                                <th class="py-3.5 px-4 border-r border-slate-800 text-center bg-slate-800 text-white">Tip Prediction</th>
                                 <th class="py-3.5 px-4 border-r border-slate-800 text-center">Over 1.5 %</th>
                                 <th class="py-3.5 px-4 border-r border-slate-800 text-center">1X2 Probabilities (H / D / A)</th>
                                 <th class="py-3.5 px-4 border-r border-slate-800 text-center">Over 2.5 / 3.5</th>
@@ -408,7 +420,7 @@
             <!-- Modal Header -->
             <div class="px-6 py-4 bg-gradient-to-r from-teal-900 via-slate-900 to-slate-900 text-white flex items-center justify-between border-b border-slate-800">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-lg shadow-md">
+                    <div class="w-10 h-10 rounded-xl bg-slate-200 text-slate-900 flex items-center justify-center font-bold text-lg shadow-md">
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <div>
@@ -440,7 +452,7 @@
         <div class="bg-slate-900 border border-slate-700 w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col">
             <div class="px-6 py-4 bg-slate-800 text-white flex items-center justify-between border-b border-slate-700">
                 <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-database text-amber-400 text-lg"></i>
+                    <i class="fa-solid fa-database text-white text-lg"></i>
                     <h3 class="font-bold text-sm">Data Source Manager</h3>
                 </div>
                 <button onclick="closeSourceModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -449,7 +461,7 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-300 mb-1">Google Sheet Published CSV URL</label>
                     <input type="text" id="customCsvUrl" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-teal-300 focus:outline-none focus:border-teal-500">
-                    <p class="text-[10px] text-slate-400 mt-1">Make sure the link ends with <code class="bg-slate-800 px-1 rounded text-amber-300">&output=csv</code></p>
+                    <p class="text-[10px] text-slate-400 mt-1">Make sure the link ends with <code class="bg-slate-800 px-1 rounded text-white">&output=csv</code></p>
                 </div>
 
                 <div class="border-t border-slate-800 pt-4">
@@ -487,11 +499,11 @@
 
         // Embedded dataset fallback matching sample data structure provided
         const SAMPLE_CSV_DATA = `DateTime,Over 1.5,Host,Guest,Tip,Result,1X2,H1,Home Probability,Draw Probability,Away Probability,Over 2.5,Over 3.5,HC1,HCX,HC2,Match Key,Match Result
-2026-02-07 14:00,37%,Valencia,Athletic Club,X2,1:2,X2,Half time results: 1:1,37%,33%,30%,35%,20%,25%,20%,55%,2026-02-07_valencia-_athleticclub,1:2
-2026-02-07 14:00,40%,Deportivo Alaves,Real Sociedad,X2,2:3,X2,Half time results: 2:1,40%,32%,28%,42%,24%,30%,22%,48%,2026-02-07_deportivoalaves-_realsociedad,2:3
-2026-02-07 13:45,27%,Taunton Town,Wimborne Town,X2,canc,X2,canc,27%,35%,38%,25%,15%,20%,20%,60%,2026-02-07_tauntontown-_wimbornetown,canc
-2026-02-07 13:45,43%,Gosport Borough,Gloucester City,1,0:2,1,Half time results: 0:0,43%,27%,30%,38%,20%,50%,25%,25%,2026-02-07_gosportborough-_gloucestercity,0:2
-2026-02-07 14:00,56%,Manchester City,Newcastle,1,3:1,1,Half time results: 3:0,56%,26%,18%,62%,40%,65%,20%,15%,2026-02-07_manchestercity-_newcastle,3:1`;
+2026-10-09,37%,Valencia,Athletic Club,X2,1:2,X2,Half time results: 1:1,37%,33%,30%,35%,20%,25%,20%,55%,2026-10-09_valencia-_athleticclub,1:2
+2026-10-09,40%,Deportivo Alaves,Real Sociedad,X2,2:3,X2,Half time results: 2:1,40%,32%,28%,42%,24%,30%,22%,48%,2026-10-09_deportivoalaves-_realsociedad,2:3
+2026-10-09,27%,Taunton Town,Wimborne Town,X2,canc,X2,canc,27%,35%,38%,25%,15%,20%,20%,60%,2026-10-09_tauntontown-_wimbornetown,canc
+2026-10-10,43%,Gosport Borough,Gloucester City,1,0:2,1,Half time results: 0:0,43%,27%,30%,38%,20%,50%,25%,25%,2026-10-10_gosportborough-_gloucestercity,0:2
+2026-10-10,56%,Manchester City,Newcastle,1,3:1,1,Half time results: 3:0,56%,26%,18%,62%,40%,65%,20%,15%,2026-10-10_manchestercity-_newcastle,3:1`;
 
         window.onload = function() {
             document.getElementById('customCsvUrl').value = CSV_URL;
@@ -550,6 +562,7 @@
 
                 let rowObj = {};
                 headers.forEach((h, idx) => {
+                    // Store original header name alongside mapped one if needed for debugging, but use mapped one for logic
                     rowObj[h] = rowValues[idx] ? rowValues[idx].trim() : '';
                 });
 
@@ -565,14 +578,35 @@
                     }
                 }
 
-                // Parse DateTime
-                let dtStr = rowObj['DateTime'] || rowObj['Match Date'] || '';
+                // Parse Date using robust parsing including simple YYYY-MM-DD
+                // Specifically look for 'Date' mapped key first, then fallback to others
+                let dtStr = rowObj['Date'] || rowObj['DateTime'] || rowObj['Match Date'] || '';
+                
+                // If there's a separate Time column, we might want to store it, but for date filtering we use the Date
                 rowObj.parsedDate = parseCustomDate(dtStr);
+                // Also ensure we have a clean string representation for the dropdown filter
+                if (dtStr) {
+                    // Simple regex to extract just the YYYY-MM-DD part if it somehow got concatenated with time
+                    let datePartMatch = dtStr.match(/^(\d{4}[-/.]\d{1,2}[-/.]\d{1,2})/);
+                    if (datePartMatch) {
+                        rowObj['DateFilterVal'] = datePartMatch[1].replace(/\//g, '-');
+                    } else {
+                        // Fallback, try to format the parsed date
+                        if (rowObj.parsedDate) {
+                             rowObj['DateFilterVal'] = formatDateISO(rowObj.parsedDate);
+                        } else {
+                             rowObj['DateFilterVal'] = dtStr; // leave as is if we can't figure it out
+                        }
+                    }
+                } else {
+                    rowObj['DateFilterVal'] = '';
+                }
 
                 rawMatchData.push(rowObj);
             }
 
             populateTipDropdown();
+            populateDateDropdown();
             applyFilters();
             showLoading(false);
             
@@ -637,7 +671,11 @@
             if (clean.includes('drawprob') || clean.includes('drawprobability') || clean === 'probx') return 'Draw Probability';
             if (clean.includes('awayprob') || clean.includes('awayprobability') || clean === 'prob2') return 'Away Probability';
 
-            if (clean === 'datetime' || clean.includes('date') || clean.includes('time')) return 'DateTime';
+            // Distinctly map Date vs Time if they exist separately
+            if (clean === 'date' || clean === 'matchdate') return 'Date';
+            if (clean === 'time' || clean === 'matchtime') return 'Time';
+            if (clean === 'datetime') return 'DateTime';
+
             if (clean === 'over15' || clean.includes('over15')) return 'Over 1.5';
             
             // Now safe to map generic Host/Guest names
@@ -665,26 +703,28 @@
             let s = dateStr.trim();
             if (!s) return null;
 
-            let isoMatch = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
-            if (isoMatch) {
-                let y = parseInt(isoMatch[1], 10);
-                let m = parseInt(isoMatch[2], 10) - 1;
-                let d = parseInt(isoMatch[3], 10);
-                return new Date(y, m, d);
-            }
+            // Handle DD/MM/YYYY or DD-MM-YYYY first
             let dmyMatch = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
             if (dmyMatch) {
-                let d = parseInt(dmyMatch[1], 10);
-                let m = parseInt(dmyMatch[2], 10) - 1;
-                let y = parseInt(dmyMatch[3], 10);
-                return new Date(y, m, d);
+                return new Date(parseInt(dmyMatch[3], 10), parseInt(dmyMatch[2], 10) - 1, parseInt(dmyMatch[1], 10));
             }
+
+            // Handle YYYY-MM-DD or YYYY/MM/DD securely
+            let isoMatch = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+            if (isoMatch) {
+                return new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+            }
+            
+            // Fallback for JS parsable strings
             let parsed = new Date(s);
-            return isNaN(parsed.getTime()) ? null : parsed;
+            if (!isNaN(parsed.getTime())) {
+                 return parsed;
+            }
+            return null;
         }
 
         function formatDateISO(dateObj) {
-            if (!dateObj) return "";
+            if (!dateObj || isNaN(dateObj.getTime())) return "";
             let y = dateObj.getFullYear();
             let m = String(dateObj.getMonth() + 1).padStart(2, '0');
             let d = String(dateObj.getDate()).padStart(2, '0');
@@ -708,10 +748,40 @@
             });
         }
 
+        function populateDateDropdown() {
+            let dates = new Set();
+            rawMatchData.forEach(r => {
+                // Use the newly created normalized DateFilterVal for the dropdown
+                let d = r['DateFilterVal'] || r['Date'] || r['DateTime'] || '';
+                if (d.trim()) dates.add(d.trim());
+            });
+
+            const select = document.getElementById('filterDate');
+            select.innerHTML = '<option value="">All Dates</option>';
+            
+            // Sort dates descending (newest first)
+            Array.from(dates).sort((a, b) => b.localeCompare(a)).forEach(d => {
+                let opt = document.createElement('option');
+                opt.value = d;
+                opt.innerText = d;
+                select.appendChild(opt);
+            });
+        }
+
         function setDatePreset(preset) {
-            const input = document.getElementById('filterDate');
-            if (preset === 'all') input.value = '';
-            else if (preset === 'today') input.value = formatDateISO(new Date());
+            const select = document.getElementById('filterDate');
+            if (preset === 'all') {
+                select.value = '';
+            } else if (preset === 'today') {
+                let todayStr = formatDateISO(new Date());
+                // Try to find if today exists in the dropdown options
+                let exists = Array.from(select.options).some(opt => opt.value === todayStr);
+                if (exists) {
+                    select.value = todayStr;
+                } else {
+                    select.value = ''; // If not found, reset
+                }
+            }
             applyFilters();
         }
 
@@ -848,8 +918,10 @@
                 if (statusVal === 'lost' && (evalResult.isWon !== false || evalResult.status !== 'settled')) return false;
                 if (statusVal === 'cancelled' && evalResult.status !== 'cancelled') return false;
 
+                // Apply Date Filter strictly checking against the normalized DateFilterVal
                 if (dateVal) {
-                    if (!row.parsedDate || formatDateISO(row.parsedDate) !== dateVal) return false;
+                    let rowRawDate = (row['DateFilterVal'] || row['Date'] || row['DateTime'] || '').trim();
+                    if (rowRawDate !== dateVal) return false;
                 }
 
                 return true;
@@ -940,10 +1012,10 @@
                 let globalIndex = startIdx + i;
                 let evalRes = evaluateTip(row['Tip'] || row['1X2'], row['Result'] || row['Match Result']);
 
-                // Status Badge
+                // Status Badge (Removed amber/gold, using white/slate where applicable)
                 let statusBadge = '';
                 if (evalRes.status === 'cancelled') {
-                    statusBadge = `<span class="px-2.5 py-1 bg-amber-950/80 text-amber-300 border border-amber-800 rounded-lg text-xs font-bold uppercase">Cancelled</span>`;
+                    statusBadge = `<span class="px-2.5 py-1 bg-slate-800 text-white border border-slate-600 rounded-lg text-xs font-bold uppercase">Cancelled</span>`;
                 } else if (evalRes.status === 'settled') {
                     if (evalRes.isWon) {
                         statusBadge = `<span class="px-2.5 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded-lg text-xs font-bold flex items-center justify-center gap-1">
@@ -962,21 +1034,27 @@
                 let hp = parseFloat(row['Home Probability']) || 0;
                 let dp = parseFloat(row['Draw Probability']) || 0;
                 let ap = parseFloat(row['Away Probability']) || 0;
+                
+                // Construct Date/Time display string for the table
+                let displayDateTime = row['DateFilterVal'] || row['Date'] || row['DateTime'] || '-';
+                if (row['Time']) {
+                    displayDateTime += ` <br><span class="text-[10px] text-slate-500">${row['Time']}</span>`;
+                }
 
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-800/60 transition border-b border-slate-800/80";
                 tr.innerHTML = `
-                    <td class="py-3.5 px-4 font-mono text-slate-300 border-r border-slate-800 whitespace-nowrap">
-                        <i class="fa-regular fa-calendar text-[10px] text-teal-400 mr-1"></i>${row['DateTime'] || '-'}
+                    <td class="py-3.5 px-4 font-mono text-slate-300 border-r border-slate-800 whitespace-nowrap text-[11px]">
+                        <i class="fa-regular fa-calendar text-[10px] text-teal-400 mr-1"></i>${displayDateTime}
                     </td>
                     <td class="py-3.5 px-4 font-extrabold text-teal-300 border-r border-slate-800">
                         ${row['Host'] || '-'}
                     </td>
-                    <td class="py-3.5 px-4 font-extrabold text-amber-300 border-r border-slate-800">
+                    <td class="py-3.5 px-4 font-extrabold text-white border-r border-slate-800">
                         ${row['Guest'] || '-'}
                     </td>
-                    <td class="py-3.5 px-4 text-center bg-amber-950/10 border-r border-slate-800">
-                        <span class="px-3 py-1 bg-amber-500 text-slate-950 font-black rounded-lg text-xs shadow-xs inline-block">
+                    <td class="py-3.5 px-4 text-center bg-slate-800/50 border-r border-slate-800">
+                        <span class="px-3 py-1 bg-white text-slate-900 font-black rounded-lg text-xs shadow-xs inline-block">
                             ${row['Tip'] || row['1X2'] || '-'}
                         </span>
                     </td>
@@ -987,16 +1065,16 @@
                         <div class="flex items-center justify-between text-[10px] font-mono font-bold mb-1">
                             <span class="text-teal-400">${hp}%</span>
                             <span class="text-slate-400">${dp}%</span>
-                            <span class="text-amber-400">${ap}%</span>
+                            <span class="text-white">${ap}%</span>
                         </div>
                         <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden flex">
                             <div style="width: ${hp}%" class="bg-teal-500"></div>
                             <div style="width: ${dp}%" class="bg-slate-500"></div>
-                            <div style="width: ${ap}%" class="bg-amber-500"></div>
+                            <div style="width: ${ap}%" class="bg-white"></div>
                         </div>
                     </td>
                     <td class="py-3.5 px-4 text-center font-mono text-slate-300 border-r border-slate-800 text-[11px]">
-                        O2.5: <span class="font-bold text-teal-300">${row['Over 2.5'] || '-'}</span> | O3.5: <span class="font-bold text-amber-300">${row['Over 3.5'] || '-'}</span>
+                        O2.5: <span class="font-bold text-teal-300">${row['Over 2.5'] || '-'}</span> | O3.5: <span class="font-bold text-white">${row['Over 3.5'] || '-'}</span>
                     </td>
                     <td class="py-3.5 px-4 text-center font-mono text-slate-400 border-r border-slate-800 text-[11px]">
                         ${row['H1'] || '-'}
@@ -1019,16 +1097,20 @@
             if (!row) return;
 
             document.getElementById('modalMatchTitle').innerText = `${row['Host'] || 'Host'} vs ${row['Guest'] || 'Guest'}`;
-            document.getElementById('modalMatchSubtitle').innerText = `Date: ${row['DateTime'] || 'N/A'}`;
+            
+            let displayModalDate = row['DateFilterVal'] || row['Date'] || row['DateTime'] || 'N/A';
+            if (row['Time']) displayModalDate += ` ${row['Time']}`;
+            document.getElementById('modalMatchSubtitle').innerText = `Date: ${displayModalDate}`;
 
             let evalRes = evaluateTip(row['Tip'] || row['1X2'], row['Result'] || row['Match Result']);
             let statusText = evalRes.status === 'settled' ? (evalRes.isWon ? '<span class="text-emerald-400 font-bold">WON</span>' : '<span class="text-rose-400 font-bold">LOST</span>') : evalRes.status;
 
+            // Removed amber/gold styling here as well
             let content = `
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase">Match Fixture Key</p>
-                        <p class="font-mono text-xs text-amber-300 font-bold mt-1 break-all">${row['Match Key'] || 'N/A'}</p>
+                        <p class="font-mono text-xs text-white font-bold mt-1 break-all">${row['Match Key'] || 'N/A'}</p>
                     </div>
                     <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800">
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase">Match Result & Status</p>
@@ -1039,7 +1121,7 @@
                 <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
                     <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider flex items-center justify-between">
                         <span>Tip & Odds Probabilities</span>
-                        <span class="px-2 py-0.5 bg-amber-500 text-slate-950 rounded text-[10px]">Tip: ${row['Tip'] || row['1X2'] || '-'}</span>
+                        <span class="px-2 py-0.5 bg-white text-slate-900 font-black rounded text-[10px]">Tip: ${row['Tip'] || row['1X2'] || '-'}</span>
                     </h4>
                     
                     <div class="grid grid-cols-3 gap-3 text-center">
@@ -1051,8 +1133,8 @@
                             <p class="text-[10px] text-slate-400 font-bold">Draw %</p>
                             <p class="text-lg font-black font-mono text-white mt-0.5">${row['Draw Probability'] || '-'}</p>
                         </div>
-                        <div class="bg-slate-900 p-3 rounded-xl border border-amber-900/60">
-                            <p class="text-[10px] text-amber-400 font-bold">Away Win %</p>
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
+                            <p class="text-[10px] text-white font-bold">Away Win %</p>
                             <p class="text-lg font-black font-mono text-white mt-0.5">${row['Away Probability'] || '-'}</p>
                         </div>
                     </div>
@@ -1078,7 +1160,7 @@
                     <div class="flex items-center justify-around font-mono text-xs font-bold">
                         <span class="text-teal-400">HC1: ${row['HC1'] || '-'}</span>
                         <span class="text-slate-400">HCX: ${row['HCX'] || '-'}</span>
-                        <span class="text-amber-400">HC2: ${row['HC2'] || '-'}</span>
+                        <span class="text-white">HC2: ${row['HC2'] || '-'}</span>
                     </div>
                 </div>
             `;
