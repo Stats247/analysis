@@ -1,0 +1,965 @@
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>⚽</text></svg>">
+
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Google Fonts: Inter & JetBrains Mono -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    pageBg: '#0F172A',
+                    cardBg: '#1E293B',
+                    cardBorder: '#334155',
+                    mainText: '#F8FAFC',
+                    secondaryText: '#94A3B8',
+                    emeraldGreen: '#059669',
+                    tealAccent: '#0D9488',
+                    skyBlue: '#38BDF8',
+                    royalBlue: '#2563EB',
+                    goldAccent: '#D4A017',
+                    successGreen: '#16A34A',
+                    errorRed: '#DC2626'
+                },
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'monospace']
+                }
+            }
+        }
+    }
+</script>
+<style>
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0F172A; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #0D9488; }
+    
+    @keyframes spinSlow {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow { animation: spinSlow 15s linear infinite; }
+    
+    .spinner {
+        border: 3.5px solid rgba(13, 148, 136, 0.2);
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border-left-color: #0D9488;
+        border-top-color: #38BDF8;
+        animation: spin 0.8s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+<!-- Header -->
+<header class="bg-cardBg/90 border-b border-cardBorder sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+        
+        <div class="flex items-center space-x-3.5">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-tealAccent via-teal-700 to-slate-800 flex items-center justify-center text-white shadow-lg shadow-teal-950/50 border border-teal-500/30">
+                <i class="fa-solid fa-chart-line text-xl text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+                    <span>Statarea System</span>
+                    <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-tealAccent/20 text-teal-300 border border-teal-500/30">Global Sports Module</span>
+                </h1>
+                <p class="text-[11px] sm:text-xs font-medium text-secondaryText flex items-center gap-1.5">
+                    <i class="fa-solid fa-futbol text-tealAccent"></i>
+                    <span>Soccer Predictive Intelligence & Live Odds Analysis</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <a href="index.html" class="px-3.5 py-2 bg-cardBg hover:bg-cardBorder border border-cardBorder text-secondaryText hover:text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-arrow-left text-tealAccent"></i>
+                <span class="hidden sm:inline">Back to Global Sports</span>
+            </a>
+            <button onclick="openSourceModal()" class="px-3.5 py-2 bg-cardBorder hover:bg-slate-700 border border-cardBorder text-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-database text-tealAccent"></i>
+                <span class="hidden sm:inline">Data Source</span>
+            </button>
+            <button onclick="loadCSVData()" class="px-3.5 py-2 bg-tealAccent hover:bg-teal-600 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-md shadow-teal-950/40">
+                <i class="fa-solid fa-rotate-right text-xs"></i>
+                <span class="hidden sm:inline">Sync Feed</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Feed Banner -->
+    <div id="syncBanner" class="px-4 py-3 rounded-2xl bg-cardBg/90 border border-cardBorder text-secondaryText text-xs font-medium flex flex-wrap items-center justify-between gap-2 shadow-sm">
+        <div class="flex items-center space-x-2.5">
+            <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-successGreen"></span>
+            </span>
+            <span>Active Data Feed: <strong id="currentSourceLabel" class="font-mono text-teal-300">Google Sheet CSV Endpoint (Statarea)</strong></span>
+        </div>
+        <div class="flex items-center space-x-3 text-[11px] text-secondaryText">
+            <span id="lastUpdatedLabel"><i class="fa-regular fa-clock mr-1 text-teal-400"></i> Updated Just Now</span>
+        </div>
+    </div>
+
+    <!-- Loading State Spinner -->
+    <div id="loadingState" class="flex flex-col items-center justify-center py-20 space-y-4">
+        <div class="spinner"></div>
+        <div class="text-center">
+            <p class="text-white font-bold text-base">Fetching Statarea Match Intelligence...</p>
+            <p class="text-secondaryText text-xs mt-1">Parsing fixtures, probabilities, and predictive tips...</p>
+        </div>
+    </div>
+
+    <!-- Error State Alert -->
+    <div id="errorState" class="hidden bg-red-950/40 border-2 border-red-800/80 text-red-200 p-6 rounded-3xl text-center max-w-2xl mx-auto my-8 shadow-xl">
+        <div class="w-12 h-12 bg-red-900/60 text-red-400 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl border border-red-700">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">Feed Unavailable</h3>
+        <p id="errorMessage" class="text-xs text-red-300 mt-1 font-medium"></p>
+        <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <button onclick="loadCSVData()" class="px-5 py-2.5 bg-tealAccent hover:bg-teal-600 text-white rounded-xl font-bold text-xs transition shadow-md inline-flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> Retry Sync
+            </button>
+            <button onclick="useFallbackSampleData()" class="px-5 py-2.5 bg-cardBorder hover:bg-slate-700 text-white rounded-xl font-bold text-xs transition shadow-md inline-flex items-center gap-2">
+                <i class="fa-solid fa-database"></i> Load Sample Dataset
+            </button>
+        </div>
+    </div>
+
+    <!-- Matches Tab Content Container -->
+    <div id="matchesTabContent" class="space-y-6 hidden">
+
+        <!-- KPI Metric Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-sm flex items-center space-x-4 border-l-4 border-l-tealAccent">
+                <div class="w-12 h-12 rounded-2xl bg-teal-950 text-teal-400 flex items-center justify-center text-xl font-bold border border-teal-800/60">
+                    <i class="fa-solid fa-futbol"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-extrabold text-secondaryText uppercase tracking-wider">Total Matches</p>
+                    <h3 id="statTotalMatches" class="text-2xl font-black text-white mt-0.5">0</h3>
+                </div>
+            </div>
+
+            <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-sm flex items-center space-x-4 border-l-4 border-l-successGreen">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-950 text-emerald-400 flex items-center justify-center text-xl font-bold border border-emerald-800/60">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-extrabold text-secondaryText uppercase tracking-wider">Predictions Won</p>
+                    <h3 id="statTotalWon" class="text-2xl font-black text-emerald-400 mt-0.5">0</h3>
+                </div>
+            </div>
+
+            <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-sm flex items-center space-x-4 border-l-4 border-l-goldAccent">
+                <div class="w-12 h-12 rounded-2xl bg-amber-950 text-goldAccent flex items-center justify-center text-xl font-bold border border-amber-800/60">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-extrabold text-secondaryText uppercase tracking-wider">Accuracy Rate</p>
+                    <h3 id="statWinRate" class="text-2xl font-black text-goldAccent mt-0.5">0%</h3>
+                </div>
+            </div>
+
+            <div class="bg-cardBg border border-cardBorder p-5 rounded-2xl shadow-sm flex items-center space-x-4 border-l-4 border-l-skyBlue">
+                <div class="w-12 h-12 rounded-2xl bg-sky-950 text-skyBlue flex items-center justify-center text-xl font-bold border border-sky-800/60">
+                    <i class="fa-solid fa-chart-simple"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-extrabold text-secondaryText uppercase tracking-wider">Avg Over 1.5 Prob</p>
+                    <h3 id="statAvgOver15" class="text-2xl font-black text-skyBlue mt-0.5">0%</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="flex space-x-2 border-b border-cardBorder mb-2">
+            <button id="tabAll" onclick="switchTab('all')" class="px-5 py-2.5 bg-tealAccent text-white rounded-t-xl font-bold text-sm shadow-sm transition">
+                <i class="fa-solid fa-table-list mr-1.5 text-xs"></i> All Statarea Fixtures
+            </button>
+            <button id="tabBetProb" onclick="switchTab('bet-prob')" class="px-5 py-2.5 bg-cardBg text-secondaryText hover:text-white rounded-t-xl font-bold text-sm transition">
+                <i class="fa-solid fa-fire mr-1.5 text-xs text-goldAccent"></i> High Confidence (Home > 58% or Away > 55%)
+            </button>
+        </div>
+
+        <!-- Filter Toolbar -->
+        <div class="bg-cardBg border border-cardBorder p-5 rounded-3xl shadow-sm space-y-4">
+            
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-3 border-b border-cardBorder gap-3">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-teal-950 text-teal-400 flex items-center justify-center font-bold text-sm border border-teal-800/60">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <h2 class="text-sm font-bold text-white uppercase tracking-wide">
+                        Statarea Filter Matrix
+                    </h2>
+                </div>
+
+                <div class="flex items-center space-x-1.5 flex-wrap gap-y-1.5">
+                    <span class="text-[10px] font-extrabold text-secondaryText uppercase mr-1">Quick Date:</span>
+                    <button onclick="setDatePreset('all')" class="px-2.5 py-1 bg-cardBorder hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold transition">All Dates</button>
+                    <button onclick="setDatePreset('today')" class="px-2.5 py-1 bg-teal-950 hover:bg-teal-900 border border-teal-700 text-teal-300 rounded-lg text-xs font-bold transition">Today</button>
+                    <button onclick="resetFilters()" class="px-2.5 py-1 bg-red-950/60 hover:bg-red-900 text-red-300 border border-red-800/60 rounded-lg text-xs font-bold transition ml-2 flex items-center gap-1">
+                        <i class="fa-solid fa-rotate-left"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Controls Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+                
+                <div>
+                    <label class="block text-[11px] font-extrabold text-secondaryText mb-1.5 uppercase tracking-wider">Search Fixture / Team</label>
+                    <div class="relative">
+                        <input type="text" id="filterSearch" oninput="applyFilters()" placeholder="Valencia, Man City..." class="w-full bg-pageBg border border-cardBorder focus:border-tealAccent text-white text-xs font-medium rounded-xl pl-8 pr-3 py-2.5 focus:outline-none transition">
+                        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-3 text-secondaryText text-xs"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-extrabold text-secondaryText mb-1.5 uppercase tracking-wider">Prediction Tip</label>
+                    <select id="filterTip" onchange="applyFilters()" class="w-full bg-cardBg border border-cardBorder focus:border-tealAccent text-white text-xs font-bold rounded-xl px-3 py-2.5 focus:outline-none transition">
+                        <option value="">All Tips (1, X, 2, X2...)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-extrabold text-secondaryText mb-1.5 uppercase tracking-wider">Match Status</label>
+                    <select id="filterStatus" onchange="applyFilters()" class="w-full bg-pageBg border border-cardBorder focus:border-tealAccent text-white text-xs font-medium rounded-xl px-3 py-2.5 focus:outline-none transition">
+                        <option value="">All Statuses</option>
+                        <option value="won">Predictions Won</option>
+                        <option value="lost">Predictions Lost</option>
+                        <option value="cancelled">Cancelled / Postponed</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-extrabold text-secondaryText mb-1.5 uppercase tracking-wider">Match Date</label>
+                    <select id="filterDate" onchange="applyFilters()" class="w-full bg-pageBg border border-cardBorder focus:border-tealAccent text-white text-xs font-medium rounded-xl px-3 py-2.5 focus:outline-none transition">
+                        <option value="">All Dates</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-extrabold text-secondaryText mb-1.5 uppercase tracking-wider">Sort Order</label>
+                    <select id="filterSort" onchange="applyFilters()" class="w-full bg-pageBg border border-cardBorder focus:border-tealAccent text-white text-xs font-medium rounded-xl px-3 py-2.5 focus:outline-none transition">
+                        <option value="date-desc">Date (Newest First)</option>
+                        <option value="date-asc">Date (Oldest First)</option>
+                        <option value="prob-over15">Highest Over 1.5 %</option>
+                        <option value="prob-home">Highest Home Win %</option>
+                        <option value="prob-away">Highest Away Win %</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Match Table Card -->
+        <div class="bg-cardBg border border-cardBorder rounded-3xl shadow-sm overflow-hidden">
+            
+            <div class="px-6 py-4 border-b border-cardBorder flex flex-wrap items-center justify-between gap-2 bg-slate-900/50">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-list-check text-teal-400 text-base"></i>
+                    <h3 class="font-extrabold text-white text-sm tracking-wide">
+                        Statarea Match Fixtures & Probability Intelligence
+                    </h3>
+                </div>
+                <span id="matchCountLabel" class="text-xs font-bold text-teal-300 bg-teal-950 border border-teal-800 px-3 py-1 rounded-xl">
+                    Showing 0 matches
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900/80 text-secondaryText uppercase text-[10px] tracking-wider font-extrabold border-b border-cardBorder">
+                            <th class="py-3.5 px-4 border-r border-slate-800">Match Date</th>
+                            <th class="py-3.5 px-4 border-r border-slate-800 text-teal-300">Home Team</th>
+                            <th class="py-3.5 px-4 border-r border-slate-800 text-white">Away Team</th>
+                            <th class="py-3.5 px-4 border-r border-slate-800 text-center bg-cardBg text-white">Tip Prediction</th>
+                            <th class="py-3.5 px-4 border-r border-slate-800 text-center">Over 1.5 %</th>
+                            <th class="py-3.5 px-4 border-r border-slate-800 text-center">1X2 Probabilities (H / D / A)</th>
+                            <th class="py-3.5 px-4 border-r border-slate-800 text-center">Over 2.5 / 3.5</th>
+                            <th class="py-3.5 px-4 border-r border-slate-800 text-center">Half Time</th>
+                            <th class="py-3.5 px-4 border-r border-slate-800 text-center">Match Result</th>
+                            <th class="py-3.5 px-4 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matchesTableBody" class="divide-y divide-slate-800/80 text-xs font-medium">
+                        <!-- Injected dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table Footer & Pagination -->
+            <div class="px-6 py-4 bg-slate-900/60 border-t border-cardBorder flex flex-col sm:flex-row items-center justify-between gap-3">
+                <span id="paginationInfo" class="text-xs font-semibold text-secondaryText">Page 1 of 1</span>
+                <div class="flex space-x-2">
+                    <button onclick="changePage(-1)" id="prevPageBtn" class="px-4 py-2 bg-cardBg border border-cardBorder rounded-xl text-xs font-bold text-slate-200 hover:bg-slate-700 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1">
+                        <i class="fa-solid fa-chevron-left text-[10px]"></i> Previous
+                    </button>
+                    <button onclick="changePage(1)" id="nextPageBtn" class="px-4 py-2 bg-cardBg border border-cardBorder rounded-xl text-xs font-bold text-slate-200 hover:bg-slate-700 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1">
+                        Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<!-- Match Dossier Modal -->
+<div id="matchDetailModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md hidden p-4 transition-all duration-300">
+    <div class="bg-cardBg border border-cardBorder w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="px-6 py-4 bg-gradient-to-r from-teal-900 via-cardBg to-cardBg text-white flex items-center justify-between border-b border-cardBorder">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-teal-500 text-slate-950 flex items-center justify-center font-bold text-lg shadow-md">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h3 id="modalMatchTitle" class="text-base font-extrabold tracking-wide text-white">Fixture Details</h3>
+                    <p id="modalMatchSubtitle" class="text-xs text-teal-300 font-medium">Statarea Predictive Dossier</p>
+                </div>
+            </div>
+            <button onclick="closeMatchModal()" class="w-8 h-8 rounded-xl bg-cardBorder hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <div id="modalBodyContent" class="p-6 overflow-y-auto space-y-5 flex-1 bg-cardBg/90">
+            <!-- Injected via JS -->
+        </div>
+        <div class="px-6 py-4 bg-cardBg border-t border-cardBorder flex justify-end">
+            <button onclick="closeMatchModal()" class="px-5 py-2 bg-cardBorder hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition">
+                Close Dossier
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Data Source Manager Modal -->
+<div id="sourceModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md hidden p-4 transition-all duration-300">
+    <div class="bg-cardBg border border-cardBorder w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+        <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between border-b border-cardBorder">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-database text-teal-400 text-lg"></i>
+                <h3 class="font-bold text-sm">Statarea Data Source Manager</h3>
+            </div>
+            <button onclick="closeSourceModal()" class="text-secondaryText hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">Google Sheet Published CSV URL</label>
+                <input type="text" id="customCsvUrl" class="w-full bg-slate-950 border border-cardBorder rounded-xl px-3 py-2 text-xs font-mono text-teal-300 focus:outline-none focus:border-tealAccent">
+            </div>
+            <div class="border-t border-cardBorder pt-4">
+                <label class="block text-xs font-bold text-slate-300 mb-1">Upload Local CSV File</label>
+                <input type="file" id="fileCsvInput" accept=".csv" class="block w-full text-xs text-secondaryText file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-950 file:text-teal-300 hover:file:bg-teal-900">
+            </div>
+        </div>
+        <div class="px-6 py-4 bg-slate-900/80 border-t border-cardBorder flex justify-end space-x-2">
+            <button onclick="closeSourceModal()" class="px-4 py-2 bg-cardBorder hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold">Cancel</button>
+            <button onclick="applyNewDataSource()" class="px-5 py-2 bg-tealAccent hover:bg-teal-600 text-white rounded-xl text-xs font-bold shadow-md">Save & Sync</button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-cardBg/80 border-t border-cardBorder py-5 text-center text-xs text-secondaryText font-medium mt-auto">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-successGreen inline-block animate-pulse"></span>
+            <span class="font-bold text-white">Statarea Native Intelligence Module</span>
+        </div>
+        <p>&copy; 2026 Global Sports Analytics. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+    let CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSL34vIGixVNKHcyXuc9XnTctlPlPRkyDASiU49clKpeoYEgE3R0YMgzixIagQj9LxNf5vZPuQiY_Uz/pub?gid=316060419&single=true&output=csv";
+    let rawMatchData = [];
+    let filteredMatchData = [];
+    let currentPage = 1;
+    const pageSize = 25;
+    let activeTab = 'all';
+
+    const SAMPLE_CSV_DATA = `DateTime,Over 1.5,Host,Guest,Tip,Result,1X2,H1,Home Probability,Draw Probability,Away Probability,Over 2.5,Over 3.5,HC1,HCX,HC2,Match Key,Match Result
+2026-10-09,37%,Valencia,Athletic Club,X2,1:2,X2,Half time results: 1:1,37%,33%,30%,35%,20%,25%,20%,55%,2026-10-09_valencia-_athleticclub,1:22026-10-09,40%,Deportivo Alaves,Real Sociedad,X2,2:3,X2,Half time results: 2:1,40%,32%,28%,42%,24%,30%,22%,48%,2026-10-09_deportivoalaves-_realsociedad,2:32026-10-09,27%,Taunton Town,Wimborne Town,X2,canc,X2,canc,27%,35%,38%,25%,15%,20%,20%,60%,2026-10-09_tauntontown-_wimbornetown,canc2026-10-10,43%,Gosport Borough,Gloucester City,1,0:2,1,Half time results: 0:0,43%,27%,30%,38%,20%,50%,25%,25%,2026-10-10_gosportborough-_gloucestercity,0:22026-10-10,56%,Manchester City,Newcastle,1,3:1,1,Half time results: 3:0,56%,26%,18%,62%,40%,65%,20%,15%,2026-10-10_manchestercity-_newcastle,3:1`;    window.onload = function() {
+        document.getElementById('customCsvUrl').value = CSV_URL;
+        loadCSVData();
+    };
+
+    async function loadCSVData() {
+        showLoading(true);
+        hideError();
+        try {
+            let response = await fetch(CSV_URL, { cache: 'no-cache' });
+            if (!response.ok) throw new Error(`HTTP Error status ${response.status}`);
+            let csvText = await response.text();
+            parseAndProcessCSV(csvText);
+        } catch (err) {
+            console.warn("Direct fetch failed, trying proxy fallback...", err);
+            try {
+                let proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(CSV_URL)}`;
+                let response = await fetch(proxyUrl);
+                if (!response.ok) throw new Error("Proxy fetch failed");
+                let csvText = await response.text();
+                parseAndProcessCSV(csvText);
+            } catch (proxyErr) {
+                console.error("Failed to load CSV feed:", proxyErr);
+                showError(`Could not connect to CSV feed. ${err.message}`);
+                useFallbackSampleData();
+            }
+        }
+    }
+
+    function useFallbackSampleData() {
+        hideError();
+        parseAndProcessCSV(SAMPLE_CSV_DATA);
+        document.getElementById('currentSourceLabel').innerText = "Embedded Sample Data Feed";
+    }
+
+    function parseAndProcessCSV(csvText) {
+        let lines = parseCSVLines(csvText);
+        if (lines.length < 2) {
+            showError("The CSV feed appears to be empty or misformatted.");
+            showLoading(false);
+            return;
+        }
+
+        let rawHeaders = parseCSVRow(lines[0]);
+        let headers = rawHeaders.map(h => normalizeHeaderKey(h));
+        rawMatchData = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            let rowValues = parseCSVRow(lines[i]);
+            if (rowValues.length === 0 || (rowValues.length === 1 && rowValues[0] === '')) continue;
+            let rowObj = {};
+            headers.forEach((h, idx) => {
+                rowObj[h] = rowValues[idx] ? rowValues[idx].trim() : '';
+            });
+
+            if (!rowObj['Host'] && !rowObj['Guest'] && rowObj['MatchName']) {
+                let split = rowObj['MatchName'].split(/\s+vs\.?\s+|\s+-\s+|\s+v\.?\s+/i);
+                if (split.length >= 2) {
+                    rowObj['Host'] = split[0].trim();
+                    rowObj['Guest'] = split[1].trim();
+                } else {
+                    rowObj['Host'] = rowObj['MatchName'];
+                    rowObj['Guest'] = '-';
+                }
+            }
+
+            let dtStr = rowObj['Date'] || rowObj['DateTime'] || rowObj['Match Date'] || '';
+            rowObj.parsedDate = parseCustomDate(dtStr);
+            if (dtStr) {
+                let datePartMatch = dtStr.match(/^(\d{4}[-/.]\d{1,2}[-/.]\d{1,2})/);
+                if (datePartMatch) {
+                    rowObj['DateFilterVal'] = datePartMatch[1].replace(/\//g, '-');
+                } else {
+                    rowObj['DateFilterVal'] = rowObj.parsedDate ? formatDateISO(rowObj.parsedDate) : dtStr;
+                }
+            } else {
+                rowObj['DateFilterVal'] = '';
+            }
+
+            rawMatchData.push(rowObj);
+        }
+
+        populateTipDropdown();
+        populateDateDropdown();
+        applyFilters();
+        showLoading(false);
+        document.getElementById('matchesTabContent').classList.remove('hidden');
+        let now = new Date();
+        document.getElementById('lastUpdatedLabel').innerHTML = `<i class="fa-regular fa-clock mr-1 text-teal-400"></i> Updated ${now.toLocaleTimeString()}`;
+    }
+
+    function parseCSVLines(csvText) {
+        let lines = [];
+        let curLine = '';
+        let inQuotes = false;
+        for (let i = 0; i < csvText.length; i++) {
+            let char = csvText[i];
+            let nextChar = csvText[i + 1];
+            if (char === '"') {
+                if (inQuotes && nextChar === '"') {
+                    curLine += '"';
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if ((char === '\r' || char === '\n') && !inQuotes) {
+                if (char === '\r' && nextChar === '\n') i++;
+                if (curLine.trim().length > 0) lines.push(curLine);
+                curLine = '';
+            } else {
+                curLine += char;
+            }
+        }
+        if (curLine.trim().length > 0) lines.push(curLine);
+        return lines;
+    }
+
+    function parseCSVRow(rowStr) {
+        let result = [];
+        let inQuote = false;
+        let currentVal = "";
+        for (let i = 0; i < rowStr.length; i++) {
+            let char = rowStr[i];
+            if (char === '"') {
+                inQuote = !inQuote;
+            } else if (char === ',' && !inQuote) {
+                result.push(currentVal);
+                currentVal = "";
+            } else {
+                currentVal += char;
+            }
+        }
+        result.push(currentVal);
+        return result.map(v => v.replace(/^["']|["']$/g, "").trim());
+    }
+
+    function normalizeHeaderKey(header) {
+        if (!header) return header;
+        let clean = header.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (clean.includes('homeprob') || clean.includes('homeprobability') || clean === 'prob1') return 'Home Probability';
+        if (clean.includes('drawprob') || clean.includes('drawprobability') || clean === 'probx') return 'Draw Probability';
+        if (clean.includes('awayprob') || clean.includes('awayprobability') || clean === 'prob2') return 'Away Probability';
+        if (clean === 'date' || clean === 'matchdate') return 'Date';
+        if (clean === 'time' || clean === 'matchtime') return 'Time';
+        if (clean === 'datetime') return 'DateTime';
+        if (clean === 'over15' || clean.includes('over15')) return 'Over 1.5';
+        if (clean === 'host' || clean.includes('home') || clean === 'team1') return 'Host';
+        if (clean === 'guest' || clean.includes('away') || clean === 'team2') return 'Guest';
+        if (clean === 'match' || clean === 'fixture' || clean === 'game') return 'MatchName';
+        if (clean === 'tip' || clean === 'prediction' || clean === '1x2') return 'Tip';
+        if (clean === 'result' || clean === 'score' || clean === 'ft') return 'Result';
+        if (clean === 'h1' || clean.includes('halftime') || clean.includes('ht')) return 'H1';
+        if (clean.includes('over25')) return 'Over 2.5';
+        if (clean.includes('over35')) return 'Over 3.5';
+        if (clean === 'hc1') return 'HC1';
+        if (clean === 'hcx') return 'HCX';
+        if (clean === 'hc2') return 'HC2';
+        if (clean.includes('matchkey') || clean.includes('key')) return 'Match Key';
+        if (clean.includes('matchresult')) return 'Match Result';
+        return header;
+    }
+
+    function parseCustomDate(dateStr) {
+        if (!dateStr) return null;
+        let s = dateStr.trim();
+        if (!s) return null;
+        let dmyMatch = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+        if (dmyMatch) return new Date(parseInt(dmyMatch[3], 10), parseInt(dmyMatch[2], 10) - 1, parseInt(dmyMatch[1], 10));
+        let isoMatch = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+        if (isoMatch) return new Date(parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10) - 1, parseInt(isoMatch[3], 10));
+        let parsed = new Date(s);
+        return !isNaN(parsed.getTime()) ? parsed : null;
+    }
+
+    function formatDateISO(dateObj) {
+        if (!dateObj || isNaN(dateObj.getTime())) return "";
+        let y = dateObj.getFullYear();
+        let m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        let d = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function populateTipDropdown() {
+        let tips = new Set();
+        rawMatchData.forEach(r => {
+            let t = r['Tip'] || r['1X2'] || '';
+            if (t.trim()) tips.add(t.trim());
+        });
+        const select = document.getElementById('filterTip');
+        select.innerHTML = '<option value="">All Tips (1, X, 2, X2...)</option>';
+        Array.from(tips).sort().forEach(t => {
+            let opt = document.createElement('option');
+            opt.value = t;
+            opt.innerText = t;
+            select.appendChild(opt);
+        });
+    }
+
+    function populateDateDropdown() {
+        let dates = new Set();
+        rawMatchData.forEach(r => {
+            let d = r['DateFilterVal'] || r['Date'] || r['DateTime'] || '';
+            if (d.trim()) dates.add(d.trim());
+        });
+        const select = document.getElementById('filterDate');
+        select.innerHTML = '<option value="">All Dates</option>';
+        Array.from(dates).sort((a, b) => b.localeCompare(a)).forEach(d => {
+            let opt = document.createElement('option');
+            opt.value = d;
+            opt.innerText = d;
+            select.appendChild(opt);
+        });
+    }
+
+    function setDatePreset(preset) {
+        const select = document.getElementById('filterDate');
+        if (preset === 'all') {
+            select.value = '';
+        } else if (preset === 'today') {
+            let todayStr = formatDateISO(new Date());
+            let exists = Array.from(select.options).some(opt => opt.value === todayStr);
+            select.value = exists ? todayStr : '';
+        }
+        applyFilters();
+    }
+
+    function resetFilters() {
+        document.getElementById('filterSearch').value = '';
+        document.getElementById('filterTip').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterDate').value = '';
+        document.getElementById('filterSort').value = 'date-desc';
+        applyFilters();
+    }
+
+    function switchTab(tabId) {
+        activeTab = tabId;
+        const tabAll = document.getElementById('tabAll');
+        const tabBetProb = document.getElementById('tabBetProb');
+        if (tabId === 'all') {
+            tabAll.className = "px-5 py-2.5 bg-tealAccent text-white rounded-t-xl font-bold text-sm shadow-sm transition";
+            tabBetProb.className = "px-5 py-2.5 bg-cardBg text-secondaryText hover:text-white rounded-t-xl font-bold text-sm transition";
+        } else {
+            tabBetProb.className = "px-5 py-2.5 bg-tealAccent text-white rounded-t-xl font-bold text-sm shadow-sm transition";
+            tabAll.className = "px-5 py-2.5 bg-cardBg text-secondaryText hover:text-white rounded-t-xl font-bold text-sm transition";
+        }
+        applyFilters();
+    }
+
+    function evaluateTip(tip, matchResultStr) {
+        if (!matchResultStr || matchResultStr.trim() === '') return { status: 'upcoming', isWon: null };
+        let resLower = matchResultStr.toLowerCase().trim();
+        if (resLower.includes('canc') || resLower.includes('postp')) return { status: 'cancelled', isWon: null };
+        let parts = resLower.match(/(\d+)\s*[:|-]\s*(\d+)/);
+        if (!parts) return { status: 'upcoming', isWon: null };
+        let homeGoals = parseInt(parts[1], 10);
+        let awayGoals = parseInt(parts[2], 10);
+        if (isNaN(homeGoals) || isNaN(awayGoals)) return { status: 'upcoming', isWon: null };
+        let actualOutcome = homeGoals > awayGoals ? '1' : (homeGoals < awayGoals ? '2' : 'X');
+        let tipClean = (tip || '').toUpperCase().trim();
+        let isWon = false;
+        if (tipClean === '1') isWon = (actualOutcome === '1');
+        else if (tipClean === 'X') isWon = (actualOutcome === 'X');
+        else if (tipClean === '2') isWon = (actualOutcome === '2');
+        else if (tipClean === '1X' || tipClean === 'X1') isWon = (actualOutcome === '1' || actualOutcome === 'X');
+        else if (tipClean === 'X2' || tipClean === '2X') isWon = (actualOutcome === 'X' || actualOutcome === '2');
+        else if (tipClean === '12' || tipClean === '21') isWon = (actualOutcome === '1' || actualOutcome === '2');
+        else if (tipClean.includes('OVER 1.5')) isWon = (homeGoals + awayGoals) > 1.5;
+        else if (tipClean.includes('OVER 2.5')) isWon = (homeGoals + awayGoals) > 2.5;
+        else {
+            let tipScoreMatch = tipClean.match(/(\d+)\s*[:|-]\s*(\d+)/);
+            if (tipScoreMatch) {
+                let th = parseInt(tipScoreMatch[1], 10);
+                let ta = parseInt(tipScoreMatch[2], 10);
+                isWon = (th === homeGoals && ta === awayGoals);
+            }
+        }
+        return { status: 'settled', isWon };
+    }
+
+    function applyFilters() {
+        const searchVal = document.getElementById('filterSearch').value.toLowerCase().trim();
+        const tipVal = document.getElementById('filterTip').value;
+        const statusVal = document.getElementById('filterStatus').value;
+        const dateVal = document.getElementById('filterDate').value;
+        const sortVal = document.getElementById('filterSort').value;
+
+        filteredMatchData = rawMatchData.filter(row => {
+            if (searchVal) {
+                let host = (row['Host'] || '').toLowerCase();
+                let guest = (row['Guest'] || '').toLowerCase();
+                let key = (row['Match Key'] || '').toLowerCase();
+                if (!host.includes(searchVal) && !guest.includes(searchVal) && !key.includes(searchVal)) return false;
+            }
+            let hp = parseFloat(row['Home Probability']) || 0;
+            let ap = parseFloat(row['Away Probability']) || 0;
+            if (activeTab === 'bet-prob' && !(hp > 58 || ap > 55)) return false;
+            if (tipVal) {
+                let rowTip = row['Tip'] || row['1X2'] || '';
+                if (rowTip.trim() !== tipVal) return false;
+            }
+            let evalResult = evaluateTip(row['Tip'] || row['1X2'], row['Result'] || row['Match Result']);
+            if (statusVal === 'won' && (!evalResult.isWon || evalResult.status !== 'settled')) return false;
+            if (statusVal === 'lost' && (evalResult.isWon !== false || evalResult.status !== 'settled')) return false;
+            if (statusVal === 'cancelled' && evalResult.status !== 'cancelled') return false;
+            if (dateVal) {
+                let rowRawDate = (row['DateFilterVal'] || row['Date'] || row['DateTime'] || '').trim();
+                if (rowRawDate !== dateVal) return false;
+            }
+            return true;
+        });
+
+        filteredMatchData.sort((a, b) => {
+            if (sortVal === 'date-desc') return (b.parsedDate ? b.parsedDate.getTime() : 0) - (a.parsedDate ? a.parsedDate.getTime() : 0);
+            if (sortVal === 'date-asc') return (a.parsedDate ? a.parsedDate.getTime() : 0) - (b.parsedDate ? b.parsedDate.getTime() : 0);
+            if (sortVal === 'prob-over15') return parseFloat(b['Over 1.5'] || 0) - parseFloat(a['Over 1.5'] || 0);
+            if (sortVal === 'prob-home') return parseFloat(b['Home Probability'] || 0) - parseFloat(a['Home Probability'] || 0);
+            if (sortVal === 'prob-away') return parseFloat(b['Away Probability'] || 0) - parseFloat(a['Away Probability'] || 0);
+            return 0;
+        });
+
+        currentPage = 1;
+        renderMatchesTable();
+        updateKPIs();
+    }
+
+    function updateKPIs() {
+        let total = filteredMatchData.length;
+        let settledCount = 0;
+        let wonCount = 0;
+        let sumOver15 = 0;
+        let countOver15 = 0;
+
+        filteredMatchData.forEach(r => {
+            let res = evaluateTip(r['Tip'] || r['1X2'], r['Result'] || r['Match Result']);
+            if (res.status === 'settled') {
+                settledCount++;
+                if (res.isWon) wonCount++;
+            }
+            let o15 = parseFloat(r['Over 1.5']);
+            if (!isNaN(o15)) {
+                sumOver15 += o15;
+                countOver15++;
+            }
+        });
+
+        let winRate = settledCount > 0 ? ((wonCount / settledCount) * 100).toFixed(1) : '0.0';
+        let avgOver15 = countOver15 > 0 ? (sumOver15 / countOver15).toFixed(1) : '0.0';
+
+        document.getElementById('statTotalMatches').innerText = total;
+        document.getElementById('statTotalWon').innerText = `${wonCount} / ${settledCount}`;
+        document.getElementById('statWinRate').innerText = `${winRate}%`;
+        document.getElementById('statAvgOver15').innerText = `${avgOver15}%`;
+    }
+
+    function changePage(dir) {
+        let maxPages = Math.ceil(filteredMatchData.length / pageSize) || 1;
+        currentPage += dir;
+        if (currentPage < 1) currentPage = 1;
+        if (currentPage > maxPages) currentPage = maxPages;
+        renderMatchesTable();
+    }
+
+    function renderMatchesTable() {
+        const tbody = document.getElementById('matchesTableBody');
+        tbody.innerHTML = '';
+        let total = filteredMatchData.length;
+        document.getElementById('matchCountLabel').innerText = `Showing ${total} matches`;
+        let maxPages = Math.ceil(total / pageSize) || 1;
+        if (currentPage > maxPages) currentPage = maxPages;
+        let startIdx = (currentPage - 1) * pageSize;
+        let endIdx = Math.min(startIdx + pageSize, total);
+        let pageRows = filteredMatchData.slice(startIdx, endIdx);
+
+        document.getElementById('paginationInfo').innerText = `Page ${currentPage} of ${maxPages} (${total === 0 ? 0 : startIdx + 1}-${endIdx} of ${total})`;
+        document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+        document.getElementById('nextPageBtn').disabled = currentPage >= maxPages;
+
+        if (pageRows.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="10" class="text-center py-12 text-secondaryText font-medium">No match fixtures found matching your active filter criteria.</td></tr>`;
+            return;
+        }
+
+        pageRows.forEach((row, i) => {
+            let globalIndex = startIdx + i;
+            let evalRes = evaluateTip(row['Tip'] || row['1X2'], row['Result'] || row['Match Result']);
+            let statusBadge = '';
+            if (evalRes.status === 'cancelled') {
+                statusBadge = `<span class="px-2.5 py-1 bg-cardBorder text-slate-300 rounded-lg text-xs font-bold uppercase">Cancelled</span>`;
+            } else if (evalRes.status === 'settled') {
+                if (evalRes.isWon) {
+                    statusBadge = `<span class="px-2.5 py-1 bg-emerald-950 text-emerald-400 border border-emerald-800 rounded-lg text-xs font-bold flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-check text-[10px]"></i> WON (${row['Result'] || row['Match Result']})
+                    </span>`;
+                } else {
+                    statusBadge = `<span class="px-2.5 py-1 bg-red-950 text-red-400 border border-red-800 rounded-lg text-xs font-bold flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-xmark text-[10px]"></i> LOST (${row['Result'] || row['Match Result']})
+                    </span>`;
+                }
+            } else {
+                statusBadge = `<span class="px-2.5 py-1 bg-cardBorder text-secondaryText rounded-lg text-xs font-semibold">Upcoming</span>`;
+            }
+
+            let hp = parseFloat(row['Home Probability']) || 0;
+            let dp = parseFloat(row['Draw Probability']) || 0;
+            let ap = parseFloat(row['Away Probability']) || 0;
+            let displayDateTime = row['DateFilterVal'] || row['Date'] || row['DateTime'] || '-';
+            if (row['Time']) displayDateTime += ` <br><span class="text-[10px] text-secondaryText">${row['Time']}</span>`;
+
+            let tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-800/60 transition border-b border-cardBorder/80";
+            tr.innerHTML = `
+                <td class="py-3.5 px-4 font-mono text-slate-300 border-r border-slate-800 whitespace-nowrap text-[11px]">
+                    <i class="fa-regular fa-calendar text-[10px] text-teal-400 mr-1"></i>${displayDateTime}
+                </td>
+                <td class="py-3.5 px-4 font-extrabold text-teal-300 border-r border-slate-800">${row['Host'] || '-'}</td>
+                <td class="py-3.5 px-4 font-extrabold text-white border-r border-slate-800">${row['Guest'] || '-'}</td>
+                <td class="py-3.5 px-4 text-center bg-cardBg border-r border-slate-800">
+                    <span class="px-3 py-1 bg-tealAccent text-white font-black rounded-lg text-xs shadow-xs inline-block">${row['Tip'] || row['1X2'] || '-'}</span>
+                </td>
+                <td class="py-3.5 px-4 text-center font-mono font-bold text-skyBlue border-r border-slate-800">${row['Over 1.5'] || '-'}</td>
+                <td class="py-3.5 px-4 border-r border-slate-800 min-w-[160px]">
+                    <div class="flex items-center justify-between text-[10px] font-mono font-bold mb-1">
+                        <span class="text-teal-400">${hp}%</span>
+                        <span class="text-secondaryText">${dp}%</span>
+                        <span class="text-white">${ap}%</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden flex">
+                        <div style="width: ${hp}%" class="bg-tealAccent"></div>
+                        <div style="width: ${dp}%" class="bg-slate-500"></div>
+                        <div style="width: ${ap}%" class="bg-white"></div>
+                    </div>
+                </td>
+                <td class="py-3.5 px-4 text-center font-mono text-slate-300 border-r border-slate-800 text-[11px]">
+                    O2.5: <span class="font-bold text-teal-300">${row['Over 2.5'] || '-'}</span> | O3.5: <span class="font-bold text-white">${row['Over 3.5'] || '-'}</span>
+                </td>
+                <td class="py-3.5 px-4 text-center font-mono text-secondaryText border-r border-slate-800 text-[11px]">${row['H1'] || '-'}</td>
+                <td class="py-3.5 px-4 text-center border-r border-slate-800">${statusBadge}</td>
+                <td class="py-3.5 px-4 text-center">
+                    <button onclick="openMatchModal(${globalIndex})" class="px-3 py-1.5 bg-cardBorder hover:bg-slate-700 text-teal-300 rounded-xl text-xs font-bold transition shadow-xs inline-flex items-center gap-1">
+                        <i class="fa-solid fa-eye text-[10px]"></i> Dossier
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function openMatchModal(globalIndex) {
+        let row = filteredMatchData[globalIndex];
+        if (!row) return;
+        document.getElementById('modalMatchTitle').innerText = `${row['Host'] || 'Host'} vs ${row['Guest'] || 'Guest'}`;
+        let displayModalDate = row['DateFilterVal'] || row['Date'] || row['DateTime'] || 'N/A';
+        if (row['Time']) displayModalDate += ` ${row['Time']}`;
+        document.getElementById('modalMatchSubtitle').innerText = `Date: ${displayModalDate}`;
+        let evalRes = evaluateTip(row['Tip'] || row['1X2'], row['Result'] || row['Match Result']);
+        let statusText = evalRes.status === 'settled' ? (evalRes.isWon ? '<span class="text-emerald-400 font-bold">WON</span>' : '<span class="text-red-400 font-bold">LOST</span>') : evalRes.status;
+
+        let content = `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-slate-950 p-4 rounded-2xl border border-cardBorder">
+                    <p class="text-[10px] font-extrabold text-secondaryText uppercase">Match Fixture Key</p>
+                    <p class="font-mono text-xs text-white font-bold mt-1 break-all">${row['Match Key'] || 'N/A'}</p>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-2xl border border-cardBorder">
+                    <p class="text-[10px] font-extrabold text-secondaryText uppercase">Match Result & Status</p>
+                    <p class="font-mono text-sm text-white font-bold mt-1">${row['Result'] || row['Match Result'] || 'Upcoming'} (${statusText})</p>
+                </div>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-2xl border border-cardBorder space-y-3">
+                <h4 class="text-xs font-extrabold text-slate-200 uppercase tracking-wider flex items-center justify-between">
+                    <span>Tip & Odds Probabilities</span>
+                    <span class="px-2 py-0.5 bg-tealAccent text-white font-black rounded text-[10px]">Tip: ${row['Tip'] || row['1X2'] || '-'}</span>
+                </h4>
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-slate-900 p-3 rounded-xl border border-teal-900/60">
+                        <p class="text-[10px] text-teal-400 font-bold">Home Win %</p>
+                        <p class="text-lg font-black font-mono text-white mt-0.5">${row['Home Probability'] || '-'}</p>
+                    </div>
+                    <div class="bg-slate-900 p-3 rounded-xl border border-cardBorder">
+                        <p class="text-[10px] text-secondaryText font-bold">Draw %</p>
+                        <p class="text-lg font-black font-mono text-white mt-0.5">${row['Draw Probability'] || '-'}</p>
+                    </div>
+                    <div class="bg-slate-900 p-3 rounded-xl border border-cardBorder">
+                        <p class="text-[10px] text-white font-bold">Away Win %</p>
+                        <p class="text-lg font-black font-mono text-white mt-0.5">${row['Away Probability'] || '-'}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="bg-slate-950 p-3 rounded-2xl border border-cardBorder">
+                    <p class="text-[10px] font-bold text-skyBlue">Over 1.5</p>
+                    <p class="text-base font-black font-mono text-white mt-0.5">${row['Over 1.5'] || '-'}</p>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-2xl border border-cardBorder">
+                    <p class="text-[10px] font-bold text-skyBlue">Over 2.5</p>
+                    <p class="text-base font-black font-mono text-white mt-0.5">${row['Over 2.5'] || '-'}</p>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-2xl border border-cardBorder">
+                    <p class="text-[10px] font-bold text-skyBlue">Over 3.5</p>
+                    <p class="text-base font-black font-mono text-white mt-0.5">${row['Over 3.5'] || '-'}</p>
+                </div>
+            </div>
+            <div class="bg-slate-950 p-4 rounded-2xl border border-cardBorder">
+                <p class="text-[10px] font-extrabold text-secondaryText uppercase mb-2">Handicap Probabilities (HC1 / HCX / HC2)</p>
+                <div class="flex items-center justify-around font-mono text-xs font-bold">
+                    <span class="text-teal-400">HC1: ${row['HC1'] || '-'}</span>
+                    <span class="text-secondaryText">HCX: ${row['HCX'] || '-'}</span>
+                    <span class="text-white">HC2: ${row['HC2'] || '-'}</span>
+                </div>
+            </div>
+        `;
+        document.getElementById('modalBodyContent').innerHTML = content;
+        document.getElementById('matchDetailModal').classList.remove('hidden');
+    }
+
+    function closeMatchModal() {
+        document.getElementById('matchDetailModal').classList.add('hidden');
+    }
+
+    function openSourceModal() {
+        document.getElementById('sourceModal').classList.remove('hidden');
+    }
+
+    function closeSourceModal() {
+        document.getElementById('sourceModal').classList.add('hidden');
+    }
+
+    function applyNewDataSource() {
+        let customUrl = document.getElementById('customCsvUrl').value.trim();
+        let fileInput = document.getElementById('fileCsvInput');
+        if (fileInput.files && fileInput.files[0]) {
+            let file = fileInput.files[0];
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                showLoading(true);
+                parseAndProcessCSV(e.target.result);
+                document.getElementById('currentSourceLabel').innerText = `Uploaded CSV: ${file.name}`;
+                closeSourceModal();
+            };
+            reader.readAsText(file);
+        } else if (customUrl) {
+            CSV_URL = customUrl;
+            document.getElementById('currentSourceLabel').innerText = customUrl;
+            closeSourceModal();
+            loadCSVData();
+        }
+    }
+
+    function showLoading(show) {
+        let spinner = document.getElementById('loadingState');
+        if (show) spinner.classList.remove('hidden');
+        else spinner.classList.add('hidden');
+    }
+
+    function showError(msg) {
+        document.getElementById('errorMessage').innerText = msg;
+        document.getElementById('errorState').classList.remove('hidden');
+    }
+
+    function hideError() {
+        document.getElementById('errorState').classList.add('hidden');
+    }
+</script>
